@@ -299,6 +299,12 @@ func (z *ZiboInstaller) GetDownloadProgress(update bool) float64 {
 
 func (z *ZiboInstaller) FindInstallationDetails() utils.ZiboInstallation {
 	var foundPath, version string
+	res := utils.ZiboInstallation{
+		Path:          foundPath,
+		Version:       version,
+		RemoteVersion: z.rss.GetLatestVersion(),
+		BackupVersion: z.GetLastBackupVersion(),
+	}
 	_ = filepath.Walk(filepath.Join(z.Config.XPlanePath, "aircraft"), func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err // prevent panic by handling failure accessing a path
@@ -311,20 +317,16 @@ func (z *ZiboInstaller) FindInstallationDetails() utils.ZiboInstallation {
 	})
 	if foundPath != "" {
 		foundPath = filepath.Join(foundPath, "../", "../")
+		res.Path = foundPath
 		versionFilePath := filepath.Join(foundPath, "version.txt")
 
 		data, err := os.ReadFile(versionFilePath)
 		if err != nil {
-			log.Fatalf("Failed to read file: %v", err)
+			log.Printf("Failed to read file: %v", err)
 		}
-		version = string(data)
+		res.Version = string(data)
 	}
-	return utils.ZiboInstallation{
-		Path:          foundPath,
-		Version:       version,
-		RemoteVersion: z.rss.GetLatestVersion(),
-		BackupVersion: z.GetLastBackupVersion(),
-	}
+	return res
 }
 
 // copyFile copies a single file from src to dst, preserving file permissions.

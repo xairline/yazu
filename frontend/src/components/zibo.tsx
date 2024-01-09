@@ -20,10 +20,18 @@ function Zibo() {
     const [ziboDetails, setZiboDetails] = useState({} as ZiboInstallation);
     const [progressDetails, setProgressDetails] = useState("")
     useEffect(() => {
-        (async () => {
+        const fetchDetails = async () => {
             const details = await FindZiboInstallationDetails();
             setZiboDetails(details)
-        })();
+        };
+        // Call it once immediately
+        fetchDetails();
+
+        // Set an interval to call it every 30 seconds
+        const interval = setInterval(fetchDetails, 3000);
+
+        // Clear the interval when the component is unmounted
+        return () => clearInterval(interval);
 
     }, []);
 

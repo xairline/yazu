@@ -5,7 +5,7 @@ import {
     GetCachedFiles,
     RestoreZiboInstallation
 } from "../../wailsjs/go/main/App";
-import {Button, Card, Divider, Spin, Table} from "antd";
+import {Button, Card, Divider, Skeleton, Spin, Table} from "antd";
 import {installer, utils} from "../../wailsjs/go/models";
 import ZiboBackup = installer.ZiboBackup;
 import ZiboInstallation = utils.ZiboInstallation;
@@ -99,6 +99,7 @@ function Backup() {
                 minHeight: "100%",
             }}
             >
+                <Skeleton/>
                 {JSON.stringify(cachedFiles)}
             </Card>
         </Spin>
