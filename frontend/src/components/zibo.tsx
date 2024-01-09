@@ -39,7 +39,7 @@ function Zibo() {
     const handleRestore = async () => {
         setRunning(true);
         setProgressDetails("Restoring ...")
-        await RestoreZiboInstallation(ziboDetails);
+        await RestoreZiboInstallation(ziboDetails, "");
         const details = await FindZiboInstallationDetails();
         setZiboDetails(details)
         setRunning(false);

@@ -46,8 +46,8 @@ export function OpenDirDialog() {
   return window['go']['main']['App']['OpenDirDialog']();
 }
 
-export function RestoreZiboInstallation(arg1) {
-  return window['go']['main']['App']['RestoreZiboInstallation'](arg1);
+export function RestoreZiboInstallation(arg1, arg2) {
+  return window['go']['main']['App']['RestoreZiboInstallation'](arg1, arg2);
 }
 
 export function UpdateZibo(arg1, arg2) {

@@ -59,11 +59,11 @@ func (a *App) BackupZiboInstallation(installation utils.ZiboInstallation) bool {
 	return err != nil
 }
 
-func (a *App) RestoreZiboInstallation(installation utils.ZiboInstallation) bool {
+func (a *App) RestoreZiboInstallation(installation utils.ZiboInstallation, backupPath string) bool {
 	if installation.Version == "" {
 		installation.Path = filepath.Join(a.zibo.Config.XPlanePath, "Aircraft", "B737-800X")
 	}
-	err := a.zibo.Restore(installation)
+	err := a.zibo.Restore(installation, backupPath)
 	return err != nil
 }
 

@@ -26,6 +26,6 @@ export function IsXPlanePathConfigured():Promise<boolean>;
 
 export function OpenDirDialog():Promise<string>;
 
-export function RestoreZiboInstallation(arg1:utils.ZiboInstallation):Promise<boolean>;
+export function RestoreZiboInstallation(arg1:utils.ZiboInstallation,arg2:string):Promise<boolean>;
 
 export function UpdateZibo(arg1:utils.ZiboInstallation,arg2:string):Promise<void>;

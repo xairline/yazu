@@ -4,7 +4,7 @@ import {Tabs} from 'antd'
 import {GetConfig} from "../../wailsjs/go/main/App";
 import Zibo from "../components/zibo";
 import Config from "../components/config";
-import Cache from "../components/cache";
+import Backup from "../components/backup";
 
 
 function Home() {
@@ -46,9 +46,9 @@ function Home() {
                         children: <Config/>,
                     },
                     {
-                        label: "Cache",
-                        key: "cache",
-                        children: <Cache/>,
+                        label: "Backups",
+                        key: "backups",
+                        children: <Backup/>,
                     },
                 ]
             }

@@ -87,7 +87,7 @@ func (z *ZiboInstaller) Backup(installation utils.ZiboInstallation) (string, err
 	return zipFilePath, nil
 }
 
-func (z *ZiboInstaller) Restore(installation utils.ZiboInstallation) error {
+func (z *ZiboInstaller) Restore(installation utils.ZiboInstallation, backupPath string) error {
 	if runtimeOS := runtime.GOOS; runtimeOS == "darwin" {
 		// run shell cmd
 		script := fmt.Sprintf("do shell script \"sudo rm -rf '%s'\" with administrator privileges", installation.Path)
@@ -103,6 +103,9 @@ func (z *ZiboInstaller) Restore(installation utils.ZiboInstallation) error {
 	}
 
 	backupZip := filepath.Join(z.Config.YazuCachePath, "backup", installation.BackupVersion+".zip")
+	if backupPath != "" {
+		backupZip = backupPath
+	}
 	destination := installation.Path
 	z.unzip(backupZip, destination, false)
 	return nil
