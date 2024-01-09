@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Button, Card, Col, Descriptions, Divider, Row, Spin, Table} from 'antd'
 // import {FindZiboInstallationDetails} from "../../wailsjs/go/main/App";
-import useBreakpoint from "antd/es/grid/hooks/useBreakpoint";
 import {
     BackupZiboInstallation,
     DownloadZibo,
@@ -47,8 +46,8 @@ function Zibo() {
     }
     const handleInstall = async () => {
         setRunning(true);
-        const isDownloading = await DownloadZibo(true);
-        while (isDownloading) {
+        const downloadInfo = await DownloadZibo(true);
+        while (downloadInfo.isDownloading) {
             const downloadDetails = await GetDownloadDetails(false);
             setProgressDetails(`${downloadDetails.toFixed(2)}%`)
             if (downloadDetails === 100) {
@@ -56,7 +55,7 @@ function Zibo() {
             }
         }
         setProgressDetails("Installing ...")
-        await InstallZibo(ziboDetails);
+        await InstallZibo(ziboDetails, downloadInfo.path);
         const details = await FindZiboInstallationDetails();
         setZiboDetails(details)
         setRunning(false);
@@ -64,8 +63,8 @@ function Zibo() {
 
     const handleUpdate = async () => {
         setRunning(true);
-        const isDownloading = await DownloadZibo(true);
-        while (isDownloading) {
+        const downloadInfo = await DownloadZibo(false);
+        while (downloadInfo.isDownloading) {
             const downloadDetails = await GetDownloadDetails(true);
             setProgressDetails(`${downloadDetails.toFixed(2)}%`)
             if (downloadDetails === 100) {
@@ -73,7 +72,7 @@ function Zibo() {
             }
         }
         setProgressDetails("Updating ...")
-        await UpdateZibo(ziboDetails);
+        await UpdateZibo(ziboDetails, downloadInfo.path);
         const details = await FindZiboInstallationDetails();
         setZiboDetails(details)
         setRunning(false);

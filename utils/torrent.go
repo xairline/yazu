@@ -3,7 +3,6 @@ package utils
 import (
 	"fmt"
 	"github.com/anacrolix/torrent"
-	"github.com/anacrolix/torrent/metainfo"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -13,7 +12,6 @@ import (
 type TorrentDownload struct {
 	Client        *torrent.Client
 	Torrent       *torrent.Torrent
-	Meta          *metainfo.MetaInfo
 	StopRequested bool
 	Size          int64 // Size of the downloaded file
 }
@@ -74,6 +72,7 @@ func (m *TorrentManager) AddTorrent(torrentURL string, subPath string) error {
 	if err != nil {
 		return err
 	}
+	tor.DisallowDataUpload()
 	<-tor.GotInfo()
 
 	// Get the size of the torrent (can be updated later if size changes)
@@ -108,4 +107,28 @@ func (m *TorrentManager) StopDownload(magnetURI string) {
 		download.Client.Close()
 		delete(m.Downloads, magnetURI)
 	}
+}
+
+type CachedFile struct {
+	Name          string `json:"name"`
+	Path          string `json:"path"`
+	CompletedSize int64  `json:"completedSize"`
+	TotalSize     int64  `json:"size"`
+}
+
+func (m *TorrentManager) GetCachedFiles() []CachedFile {
+	var res []CachedFile
+	for _, download := range m.Downloads {
+		fileName := download.Torrent.Info().Name
+		bytesCompleted := download.Torrent.BytesCompleted()
+		totalBytes := download.Torrent.Info().TotalLength()
+		path := download.Torrent.Files()[0].Path()
+		res = append(res, CachedFile{
+			Name:          fileName,
+			Path:          path,
+			CompletedSize: bytesCompleted,
+			TotalSize:     totalBytes,
+		})
+	}
+	return res
 }

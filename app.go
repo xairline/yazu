@@ -5,6 +5,7 @@ import (
 	"changeme/utils"
 	"context"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
+	"log"
 	"path/filepath"
 )
 
@@ -12,6 +13,11 @@ import (
 type App struct {
 	ctx  context.Context
 	zibo *installer.ZiboInstaller
+}
+
+type DownloadInfo struct {
+	IsDownloading bool   `json:"isDownloading"`
+	Path          string `json:"path"`
 }
 
 // NewApp creates a new App application struct
@@ -61,23 +67,37 @@ func (a *App) RestoreZiboInstallation(installation utils.ZiboInstallation) bool 
 	return err != nil
 }
 
-func (a *App) InstallZibo(installation utils.ZiboInstallation) {
+func (a *App) InstallZibo(installation utils.ZiboInstallation, zipPath string) {
 	if installation.Version == "" {
 		installation.Path = filepath.Join(a.zibo.Config.XPlanePath, "Aircraft", "B737-800X")
 	} else {
 		a.zibo.RemoveOldInstalls(installation)
 	}
-	a.zibo.Install(installation)
+	a.zibo.Install(installation, zipPath)
 }
 
-func (a *App) DownloadZibo(fullInstall bool) bool {
-	return a.zibo.DownloadZibo(fullInstall)
+func (a *App) DownloadZibo(fullInstall bool) DownloadInfo {
+	isDownloading, zipFilePath := a.zibo.DownloadZibo(fullInstall)
+	log.Printf("isDownloading: %v, zipFilePath: %v", isDownloading, zipFilePath)
+	res := DownloadInfo{
+		IsDownloading: isDownloading,
+		Path:          zipFilePath,
+	}
+	return res
 }
 
-func (a *App) UpdateZibo(installation utils.ZiboInstallation) {
-	a.zibo.Update(installation)
+func (a *App) UpdateZibo(installation utils.ZiboInstallation, zipPath string) {
+	a.zibo.Update(installation, zipPath)
 }
 
 func (a *App) GetDownloadDetails(update bool) float64 {
 	return a.zibo.GetDownloadProgress(update)
+}
+
+func (a *App) GetBackups() []installer.ZiboBackup {
+	return a.zibo.GetBackups()
+}
+
+func (a *App) GetCachedFiles() []utils.CachedFile {
+	return a.zibo.TorrentManager.GetCachedFiles()
 }

@@ -18,6 +18,14 @@ export function FindZiboInstallationDetails() {
   return window['go']['main']['App']['FindZiboInstallationDetails']();
 }
 
+export function GetBackups() {
+  return window['go']['main']['App']['GetBackups']();
+}
+
+export function GetCachedFiles() {
+  return window['go']['main']['App']['GetCachedFiles']();
+}
+
 export function GetConfig() {
   return window['go']['main']['App']['GetConfig']();
 }
@@ -26,8 +34,8 @@ export function GetDownloadDetails(arg1) {
   return window['go']['main']['App']['GetDownloadDetails'](arg1);
 }
 
-export function InstallZibo(arg1) {
-  return window['go']['main']['App']['InstallZibo'](arg1);
+export function InstallZibo(arg1, arg2) {
+  return window['go']['main']['App']['InstallZibo'](arg1, arg2);
 }
 
 export function IsXPlanePathConfigured() {
@@ -42,6 +50,6 @@ export function RestoreZiboInstallation(arg1) {
   return window['go']['main']['App']['RestoreZiboInstallation'](arg1);
 }
 
-export function UpdateZibo(arg1) {
-  return window['go']['main']['App']['UpdateZibo'](arg1);
+export function UpdateZibo(arg1, arg2) {
+  return window['go']['main']['App']['UpdateZibo'](arg1, arg2);
 }

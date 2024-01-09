@@ -7,7 +7,7 @@ import {Link, Route, Routes} from "react-router-dom";
 import useBreakpoint from "antd/es/grid/hooks/useBreakpoint";
 import logo from './assets/images/logo-universal.png';
 import Home from "./pages/home";
-import Config from "./pages/config";
+import Config from "./components/config";
 
 const {Content,} = Layout;
 const {Title} = Typography;
