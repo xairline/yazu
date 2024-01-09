@@ -34,7 +34,10 @@ var (
 )
 
 // GetConfig returns the singleton instance of Config.
-func GetConfig(homeDirGetter HomeDirGetter) *Config {
+func GetConfig(homeDirGetter HomeDirGetter, singleton bool) *Config {
+	if !singleton {
+		return newConfig(homeDirGetter)
+	}
 	once.Do(func() {
 		instance = newConfig(homeDirGetter)
 	})

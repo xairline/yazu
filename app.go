@@ -17,7 +17,7 @@ type App struct {
 // NewApp creates a new App application struct
 func NewApp() *App {
 	return &App{
-		zibo: installer.NewZibo(utils.RealHomeDirGetter{}),
+		zibo: installer.NewZibo(utils.RealHomeDirGetter{}, true),
 	}
 }
 
@@ -28,11 +28,11 @@ func (a *App) startup(ctx context.Context) {
 }
 
 func (a *App) IsXPlanePathConfigured() bool {
-	config := utils.GetConfig(utils.RealHomeDirGetter{})
+	config := utils.GetConfig(utils.RealHomeDirGetter{}, true)
 	return config.CheckXPlanePath(a.zibo.Config.XPlanePath)
 }
 func (a *App) CheckXPlanePath(dirPath string) bool {
-	config := utils.GetConfig(utils.RealHomeDirGetter{})
+	config := utils.GetConfig(utils.RealHomeDirGetter{}, true)
 	return config.CheckXPlanePath(dirPath)
 }
 func (a *App) GetConfig() utils.Config {
@@ -49,14 +49,16 @@ func (a *App) FindZiboInstallationDetails() utils.ZiboInstallation {
 }
 
 func (a *App) BackupZiboInstallation(installation utils.ZiboInstallation) bool {
-	return a.zibo.Backup(installation)
+	_, err := a.zibo.Backup(installation)
+	return err != nil
 }
 
 func (a *App) RestoreZiboInstallation(installation utils.ZiboInstallation) bool {
 	if installation.Version == "" {
 		installation.Path = filepath.Join(a.zibo.Config.XPlanePath, "Aircraft", "B737-800X")
 	}
-	return a.zibo.Restore(installation)
+	err := a.zibo.Restore(installation)
+	return err != nil
 }
 
 func (a *App) InstallZibo(installation utils.ZiboInstallation) {

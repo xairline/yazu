@@ -16,7 +16,7 @@ func TestNewConfig(t *testing.T) {
 	mockHomeDirGetter := MockHomeDirGetter{HomeDir: tempDir}
 
 	// Act: Call NewConfig with the mock implementation
-	config := NewConfig(mockHomeDirGetter)
+	config := GetConfig(mockHomeDirGetter)
 
 	// Assert: Check if the configuration was created correctly
 	assert.NotNil(t, config, "Config should not be nil")
@@ -35,7 +35,7 @@ func TestSave(t *testing.T) {
 	mockHomeDirGetter := MockHomeDirGetter{HomeDir: tempDir}
 
 	// Act: Call NewConfig with the mock implementation
-	config := NewConfig(mockHomeDirGetter) // Override the HOME environment variable for the test
+	config := GetConfig(mockHomeDirGetter) // Override the HOME environment variable for the test
 
 	// Act: Call Save to save the configuration
 	err := config.Save()

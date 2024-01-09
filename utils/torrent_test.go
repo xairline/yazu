@@ -21,7 +21,7 @@ func TestTorrentDownloadAndStop(t *testing.T) {
 
 	// Start a torrent download
 	magnetURI := "https://skymatixva.com/tfiles/B738X_XP12_4_00_3.zip.torrent"
-	err = manager.AddTorrent(magnetURI)
+	err = manager.AddTorrent(magnetURI, "")
 	if err != nil {
 		t.Fatalf("Failed to add torrent: %v", err)
 	}

@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"path/filepath"
 )
 
 type TorrentDownload struct {
@@ -29,7 +30,7 @@ func NewTorrentManager(path string) *TorrentManager {
 	}
 }
 
-func (m *TorrentManager) AddTorrent(torrentURL string) error {
+func (m *TorrentManager) AddTorrent(torrentURL string, subPath string) error {
 	// Download the torrent file
 	resp, err := http.Get(torrentURL)
 	if err != nil {
@@ -62,7 +63,7 @@ func (m *TorrentManager) AddTorrent(torrentURL string) error {
 	}
 
 	cfg := torrent.NewDefaultClientConfig()
-	cfg.DataDir = m.DownloadPath
+	cfg.DataDir = filepath.Join(m.DownloadPath, subPath)
 
 	client, err := torrent.NewClient(cfg)
 	if err != nil {
