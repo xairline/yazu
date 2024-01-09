@@ -6,8 +6,6 @@
   "frontend:build": "npm run build",
   "frontend:dev:watcher": "npm run dev",
   "frontend:dev:serverUrl": "auto",
-  "obfuscated": true,
-  "garbleargs": "-literals -tiny -seed=bm90NHlvdTJzZWUh",
   "author": {
     "name": "Di Zou",
     "email": "di.zou1214@gmail.com"
