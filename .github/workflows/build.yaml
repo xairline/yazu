@@ -17,13 +17,13 @@ jobs:
       fail-fast: false
       matrix:
         build:
-          - name: 'App'
+          - name: 'yazu'
             platform: 'linux/amd64'
             os: 'ubuntu-latest'
-          - name: 'App'
+          - name: 'yazu.exe'
             platform: 'windows/amd64'
             os: 'windows-latest'
-          - name: 'App'
+          - name: 'yazu'
             platform: 'darwin/universal'
             os: 'macos-latest'
 
@@ -38,7 +38,7 @@ jobs:
         uses: dAppServer/wails-build-action@main
         id: build
         with:
-          build-name: yazu
+          build-name: ${{ matrix.build.name }}
           build-platform: ${{ matrix.build.platform }}
           nsis: false
           package: true
