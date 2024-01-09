@@ -7,143 +7,40 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/saracen/fastzip"
-	"gopkg.in/yaml.v3"
 	"io"
 	"io/fs"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
-	"path"
 	"path/filepath"
 	"runtime"
 	"strings"
-	"sync"
 )
 
-type ZiboInstallation struct {
-	Path          string `json:"path"`
-	Version       string `json:"version"`
-	RemoteVersion string `json:"remoteVersion"`
-	BackupVersion string `json:"backupVersion"`
-}
-
-type Config struct {
-	XPlanePath     string `yaml:"xplane_path" json:"XPlanePath"`
-	YazuCachePath  string `yaml:"yazu_cache_path" json:"YazuCachePath"`
+type ZiboInstaller struct {
 	torrentManager *utils.TorrentManager
-	mu             sync.Mutex
 	rss            *utils.Rss
+	Config         *utils.Config
 }
 
-func NewConfig(homeDirGetter utils.HomeDirGetter) *Config {
-	// check if config file exists
-	homeDir, err := homeDirGetter.UserHomeDir()
-	if err != nil {
-		log.Fatalf("failed to get user home directory: %v", err)
+func NewZibo(homeDirGetter utils.HomeDirGetter) *ZiboInstaller {
+	config := utils.GetConfig(homeDirGetter)
+	return &ZiboInstaller{
+		torrentManager: utils.NewTorrentManager(config.YazuCachePath),
+		rss:            utils.NewRss("https://skymatixva.com/tfiles/feed.xml"),
+		Config:         config,
 	}
-
-	configDir := filepath.Join(homeDir, ".yazu")
-	configFilePath := filepath.Join(configDir, "config.yaml")
-
-	// Check if the directory exists, create it if not
-	if _, err := os.Stat(configDir); os.IsNotExist(err) {
-		err := os.MkdirAll(configDir, 0755) // Creates the directory with read, write, and execute permissions for the user
-		if err != nil {
-			log.Fatalf("Error creating config directory: %s", err)
-		}
-	}
-
-	// Check if the config file exists
-	if _, err := os.Stat(configFilePath); os.IsNotExist(err) {
-		// File does not exist, create a default config
-		defaultConfig := &Config{
-			YazuCachePath: path.Join(homeDir, ".yazu", "cache"),
-		}
-		data, err := yaml.Marshal(defaultConfig)
-		if err != nil {
-			log.Fatalf("Error marshaling default config: %s", err)
-		}
-		if err := ioutil.WriteFile(configFilePath, data, 0644); err != nil {
-			log.Fatalf("Error writing default config file: %s", err)
-		}
-	}
-	// File exists, read the config file
-	data, err := os.ReadFile(configFilePath)
-	if err != nil {
-		log.Fatalf("Error reading config file: %s", err)
-	}
-
-	// Unmarshal the config data into an Config instance
-	config := &Config{}
-	if err := yaml.Unmarshal(data, config); err != nil {
-		log.Fatalf("Error unmarshaling config data: %s", err)
-	}
-
-	config.torrentManager = utils.NewTorrentManager(config.YazuCachePath)
-	config.rss = utils.NewRss("https://skymatixva.com/tfiles/feed.xml")
-	return config
 }
 
-func (c *Config) Save() error {
-	// Lock the config mutex to prevent concurrent writes
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
-	// Marshal the config instance into JSON
-	data, err := yaml.Marshal(c)
-	if err != nil {
-		return err
-	}
-
-	// Write the config file
-	configFilePath, err := os.UserHomeDir()
-	if err != nil {
-		log.Fatalf("failed to get user home directory: %v", err)
-	}
-	configFilePath += "/.yazu/config.yaml"
-	if err := os.WriteFile(configFilePath, data, 0644); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (c *Config) CheckXPlanePath(dirPath string) bool {
-	// check if path contains a file that contains name of X-Plane 12 Installer
-	found := false
-	_ = filepath.Walk(dirPath, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-
-		if info.IsDir() && path != dirPath {
-			// If the path is a subdirectory, skip it
-			return filepath.SkipDir
-		}
-		if !info.IsDir() {
-			if strings.Contains(path, "Log.txt") {
-				// store path in home directory
-				c.XPlanePath = filepath.Dir(path)
-				_ = c.Save()
-				found = true
-			}
-		}
-		return nil
-	})
-
-	return found
-}
-
-func (c *Config) GetCachedVersions(update bool) []string {
+func (z *ZiboInstaller) GetCachedVersions(update bool) []string {
 	// check if path contains a file that contains name of X-Plane 12 Installer
 	cachedVersions := []string{}
-	_ = filepath.Walk(c.YazuCachePath, func(path string, info os.FileInfo, err error) error {
+	_ = filepath.Walk(z.Config.YazuCachePath, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
 
-		if info.IsDir() && path != c.YazuCachePath {
+		if info.IsDir() && path != z.Config.YazuCachePath {
 			// If the path is a subdirectory, skip it
 			return filepath.SkipDir
 		}
@@ -160,7 +57,7 @@ func (c *Config) GetCachedVersions(update bool) []string {
 				}
 
 				cachedZipPath := path
-				version := strings.ReplaceAll(cachedZipPath, c.YazuCachePath, "")
+				version := strings.ReplaceAll(cachedZipPath, z.Config.YazuCachePath, "")
 				version = strings.ReplaceAll(version, ".zip", "")
 				version = strings.ReplaceAll(version, "/", "")
 				if update {
@@ -175,26 +72,26 @@ func (c *Config) GetCachedVersions(update bool) []string {
 	return cachedVersions
 }
 
-func (c *Config) Update(installation ZiboInstallation) {
-	patchItems := *c.rss.GetPatchItems()
+func (z *ZiboInstaller) Update(installation utils.ZiboInstallation) {
+	patchItems := *z.rss.GetPatchInstallItems()
 	patchItem := patchItems[len(patchItems)-1]
-	download := c.torrentManager.Downloads[patchItem.Link]
+	download := z.torrentManager.Downloads[patchItem.Link]
 	files := download.Torrent.Files()
 	file := files[0]
-	_ = os.Rename(filepath.Join(c.YazuCachePath, file.Path()), filepath.Join(c.YazuCachePath, patchItem.Version+".zip.patch"))
-	c.unzip(filepath.Join(c.YazuCachePath, patchItem.Version+".zip.patch"), installation.Path)
+	_ = os.Rename(filepath.Join(z.Config.YazuCachePath, file.Path()), filepath.Join(z.Config.YazuCachePath, patchItem.Version+".zip.patch"))
+	z.unzip(filepath.Join(z.Config.YazuCachePath, patchItem.Version+".zip.patch"), installation.Path)
 }
 
-func (c *Config) Backup(installation ZiboInstallation) bool {
+func (z *ZiboInstaller) Backup(installation utils.ZiboInstallation) bool {
 	// Check if the directory exists, create it if not
-	if _, err := os.Stat(c.YazuCachePath); os.IsNotExist(err) {
-		err := os.MkdirAll(c.YazuCachePath, 0755) // Creates the directory with read, write, and execute permissions for the user
+	if _, err := os.Stat(z.Config.YazuCachePath); os.IsNotExist(err) {
+		err := os.MkdirAll(z.Config.YazuCachePath, 0755) // Creates the directory with read, write, and execute permissions for the user
 		if err != nil {
-			log.Fatalf("Error creating config directory: %s", err)
+			log.Fatalf("Error creating Config directory: %s", err)
 		}
 	}
 
-	zipFilePath := filepath.Join(c.YazuCachePath, installation.Version+"-backup.zip")
+	zipFilePath := filepath.Join(z.Config.YazuCachePath, installation.Version+"-backup.zip")
 	// Create archive file
 	w, err := os.Create(zipFilePath)
 	if err != nil {
@@ -223,7 +120,7 @@ func (c *Config) Backup(installation ZiboInstallation) bool {
 	return true
 }
 
-func (c *Config) Restore(installation ZiboInstallation) bool {
+func (z *ZiboInstaller) Restore(installation utils.ZiboInstallation) bool {
 	if runtimeOS := runtime.GOOS; runtimeOS == "darwin" {
 		// run shell cmd
 		script := fmt.Sprintf("do shell script \"sudo rm -rf '%s'\" with administrator privileges", installation.Path)
@@ -237,13 +134,13 @@ func (c *Config) Restore(installation ZiboInstallation) bool {
 		_ = os.RemoveAll(installation.Path)
 	}
 
-	backupZip := filepath.Join(c.YazuCachePath, installation.BackupVersion+"-backup.zip")
+	backupZip := filepath.Join(z.Config.YazuCachePath, installation.BackupVersion+"-backup.zip")
 	destination := installation.Path
-	c.unzip(backupZip, destination)
+	z.unzip(backupZip, destination)
 	return true
 }
 
-func (c *Config) unzip(src, dst string, fresh ...bool) {
+func (z *ZiboInstaller) unzip(src, dst string, fresh ...bool) {
 	// create a tmp directory
 	tmpDir := os.TempDir()
 	uuid := uuid.New().String()
@@ -361,21 +258,21 @@ func ditto(src, dst string) error {
 	})
 }
 
-func (c *Config) GetLastBackupVersion() string {
+func (z *ZiboInstaller) GetLastBackupVersion() string {
 	backupVersion := "N/A"
-	_ = filepath.Walk(c.YazuCachePath, func(path string, info os.FileInfo, err error) error {
+	_ = filepath.Walk(z.Config.YazuCachePath, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
 
-		if info.IsDir() && path != c.YazuCachePath {
+		if info.IsDir() && path != z.Config.YazuCachePath {
 			// If the path is a subdirectory, skip it
 			return filepath.SkipDir
 		}
 		if !info.IsDir() {
 			if strings.LastIndex(path, "-backup.zip") != -1 {
 				backupPath := path
-				backupVersion = strings.ReplaceAll(backupPath, c.YazuCachePath, "")
+				backupVersion = strings.ReplaceAll(backupPath, z.Config.YazuCachePath, "")
 				backupVersion = strings.ReplaceAll(backupVersion, "-backup.zip", "")
 				backupVersion = strings.ReplaceAll(backupVersion, "/", "")
 			}
@@ -386,7 +283,7 @@ func (c *Config) GetLastBackupVersion() string {
 	return backupVersion
 }
 
-func (c *Config) RemoveOldInstalls(installation ZiboInstallation) {
+func (z *ZiboInstaller) RemoveOldInstalls(installation utils.ZiboInstallation) {
 	log.Printf("Removing %s", installation.Path)
 	// if os is mac
 	if runtimeOS := runtime.GOOS; runtimeOS == "darwin" {
@@ -402,18 +299,18 @@ func (c *Config) RemoveOldInstalls(installation ZiboInstallation) {
 	}
 }
 
-func (c *Config) DownloadZibo(fullInstall bool) bool {
+func (z *ZiboInstaller) DownloadZibo(fullInstall bool) bool {
 	var installItem utils.Item
 	if fullInstall {
-		fullInstallItems := *c.rss.GetFullInstallItems()
+		fullInstallItems := *z.rss.GetFullInstallItems()
 		installItem = fullInstallItems[0]
 	} else {
-		patchedItems := *c.rss.GetPatchItems()
+		patchedItems := *z.rss.GetPatchInstallItems()
 		installItem = patchedItems[len(patchedItems)-1]
 	}
 	cached := false
 	isDownloading := false
-	cachedVersions := c.GetCachedVersions(false)
+	cachedVersions := z.GetCachedVersions(false)
 
 	for _, cachedVersion := range cachedVersions {
 		if cachedVersion == installItem.Version && installItem.Version != "" {
@@ -425,7 +322,7 @@ func (c *Config) DownloadZibo(fullInstall bool) bool {
 
 	if !cached {
 		log.Printf("Downloading %s, from: %s", installItem.Version, installItem.Link)
-		err := c.torrentManager.AddTorrent(installItem.Link)
+		err := z.torrentManager.AddTorrent(installItem.Link)
 		if err != nil {
 			log.Fatalf("Error downloading torrent: %s", err)
 		}
@@ -435,28 +332,58 @@ func (c *Config) DownloadZibo(fullInstall bool) bool {
 	return isDownloading
 }
 
-func (c *Config) Install(installation ZiboInstallation) {
-	fullInstallItems := *c.rss.GetFullInstallItems()
+func (z *ZiboInstaller) Install(installation utils.ZiboInstallation) {
+	fullInstallItems := *z.rss.GetFullInstallItems()
 	fullInstallItem := fullInstallItems[0]
-	download := c.torrentManager.Downloads[fullInstallItem.Link]
+	download := z.torrentManager.Downloads[fullInstallItem.Link]
 	files := download.Torrent.Files()
 	file := files[0]
-	_ = os.Rename(filepath.Join(c.YazuCachePath, file.Path()), filepath.Join(c.YazuCachePath, fullInstallItem.Version+".zip"))
-	c.unzip(filepath.Join(c.YazuCachePath, fullInstallItem.Version+".zip"), installation.Path)
+	_ = os.Rename(filepath.Join(z.Config.YazuCachePath, file.Path()), filepath.Join(z.Config.YazuCachePath, fullInstallItem.Version+".zip"))
+	z.unzip(filepath.Join(z.Config.YazuCachePath, fullInstallItem.Version+".zip"), installation.Path)
 }
 
-func (c *Config) GetDownloadProgress(update bool) float64 {
+func (z *ZiboInstaller) GetDownloadProgress(update bool) float64 {
 	var link string
 	if !update {
-		fullItems := *c.rss.GetFullInstallItems()
+		fullItems := *z.rss.GetFullInstallItems()
 		fullItem := fullItems[0]
 		link = fullItem.Link
 	} else {
-		patchItems := *c.rss.GetPatchItems()
+		patchItems := *z.rss.GetPatchInstallItems()
 		patchItem := patchItems[len(patchItems)-1]
 		link = patchItem.Link
 	}
 
-	progress := c.torrentManager.CheckProgress()
+	progress := z.torrentManager.CheckProgress()
 	return progress[link]
+}
+
+func (z *ZiboInstaller) FindInstallationDetails() utils.ZiboInstallation {
+	var foundPath, version string
+	_ = filepath.Walk(filepath.Join(z.Config.XPlanePath, "aircraft"), func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err // prevent panic by handling failure accessing a path
+		}
+		if info.IsDir() && info.Name() == "zibomod" {
+			foundPath = path
+			return filepath.SkipDir // folder found, skip the rest of this directory
+		}
+		return nil
+	})
+	if foundPath != "" {
+		foundPath = filepath.Join(foundPath, "../", "../")
+		versionFilePath := filepath.Join(foundPath, "version.txt")
+
+		data, err := os.ReadFile(versionFilePath)
+		if err != nil {
+			log.Fatalf("Failed to read file: %v", err)
+		}
+		version = string(data)
+	}
+	return utils.ZiboInstallation{
+		Path:          foundPath,
+		Version:       version,
+		RemoteVersion: z.rss.GetLatestVersion(),
+		BackupVersion: z.GetLastBackupVersion(),
+	}
 }

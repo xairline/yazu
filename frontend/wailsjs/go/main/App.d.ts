@@ -10,11 +10,11 @@ export function DownloadZibo(arg1:boolean):Promise<boolean>;
 
 export function FindZiboInstallationDetails():Promise<utils.ZiboInstallation>;
 
-export function FreshInstallZibo(arg1:utils.ZiboInstallation):Promise<void>;
-
 export function GetConfig():Promise<utils.Config>;
 
 export function GetDownloadDetails(arg1:boolean):Promise<number>;
+
+export function InstallZibo(arg1:utils.ZiboInstallation):Promise<void>;
 
 export function IsXPlanePathConfigured():Promise<boolean>;
 

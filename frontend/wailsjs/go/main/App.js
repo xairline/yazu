@@ -18,16 +18,16 @@ export function FindZiboInstallationDetails() {
   return window['go']['main']['App']['FindZiboInstallationDetails']();
 }
 
-export function FreshInstallZibo(arg1) {
-  return window['go']['main']['App']['FreshInstallZibo'](arg1);
-}
-
 export function GetConfig() {
   return window['go']['main']['App']['GetConfig']();
 }
 
 export function GetDownloadDetails(arg1) {
   return window['go']['main']['App']['GetDownloadDetails'](arg1);
+}
+
+export function InstallZibo(arg1) {
+  return window['go']['main']['App']['InstallZibo'](arg1);
 }
 
 export function IsXPlanePathConfigured() {

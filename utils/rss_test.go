@@ -16,6 +16,12 @@ func TestFetchRssFeedValidURL(t *testing.T) {
 	fullInstallItems := rss.GetFullInstallItems()
 	assert.NotEqual(t, 0, len(*fullInstallItems))
 
+	patchInstallItems := rss.GetPatchInstallItems()
+	assert.NotEqual(t, 0, len(*patchInstallItems))
+
+	latestVersion := rss.GetLatestVersion()
+	assert.NotEqual(t, "", latestVersion)
+
 	for _, fullInstallItem := range *fullInstallItems {
 		assert.NotNil(t, fullInstallItem)
 		assert.NotNil(t, fullInstallItem.Version)

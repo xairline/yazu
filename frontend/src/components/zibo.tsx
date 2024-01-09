@@ -6,8 +6,8 @@ import {
     BackupZiboInstallation,
     DownloadZibo,
     FindZiboInstallationDetails,
-    FreshInstallZibo,
     GetDownloadDetails,
+    InstallZibo,
     RestoreZiboInstallation,
     UpdateZibo
 } from "../../wailsjs/go/main/App";
@@ -16,7 +16,7 @@ import ZiboInstallation = utils.ZiboInstallation;
 
 
 function Zibo() {
-    const screens = useBreakpoint();
+    // const screens = useBreakpoint();
     const [running, setRunning] = useState(false);
     const [ziboDetails, setZiboDetails] = useState({} as ZiboInstallation);
     const [progressDetails, setProgressDetails] = useState("")
@@ -56,7 +56,7 @@ function Zibo() {
             }
         }
         setProgressDetails("Installing ...")
-        await FreshInstallZibo(ziboDetails);
+        await InstallZibo(ziboDetails);
         const details = await FindZiboInstallationDetails();
         setZiboDetails(details)
         setRunning(false);

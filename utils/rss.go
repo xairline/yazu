@@ -80,7 +80,7 @@ func (r *Rss) GetFullInstallItems() *[]Item {
 	return &items
 }
 
-func (r *Rss) GetPatchItems() *[]Item {
+func (r *Rss) GetPatchInstallItems() *[]Item {
 	var items []Item
 	versionRegEx, _ := regexp.Compile(`XP12.*\.zip\.torrent`)
 	for _, item := range r.Channel.Items {
@@ -98,7 +98,7 @@ func (r *Rss) GetPatchItems() *[]Item {
 }
 
 func (r *Rss) GetLatestVersion() string {
-	patchItems := *r.GetPatchItems()
+	patchItems := *r.GetPatchInstallItems()
 	if len(patchItems) > 0 {
 		return patchItems[len(patchItems)-1].Version
 	} else {

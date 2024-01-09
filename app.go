@@ -5,21 +5,19 @@ import (
 	"changeme/utils"
 	"context"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
-	"log"
-	"os"
 	"path/filepath"
 )
 
 // App struct
 type App struct {
-	ctx    context.Context
-	config *installer.Config
+	ctx  context.Context
+	zibo *installer.ZiboInstaller
 }
 
 // NewApp creates a new App application struct
 func NewApp() *App {
 	return &App{
-		config: installer.NewConfig(utils.RealHomeDirGetter{}),
+		zibo: installer.NewZibo(utils.RealHomeDirGetter{}),
 	}
 }
 
@@ -30,79 +28,54 @@ func (a *App) startup(ctx context.Context) {
 }
 
 func (a *App) IsXPlanePathConfigured() bool {
-	return a.config.CheckXPlanePath(a.config.XPlanePath)
+	config := utils.GetConfig(utils.RealHomeDirGetter{})
+	return config.CheckXPlanePath(a.zibo.Config.XPlanePath)
 }
 func (a *App) CheckXPlanePath(dirPath string) bool {
-	return a.config.CheckXPlanePath(dirPath)
+	config := utils.GetConfig(utils.RealHomeDirGetter{})
+	return config.CheckXPlanePath(dirPath)
 }
-func (a *App) GetConfig() installer.Config {
-	return *a.config
+func (a *App) GetConfig() utils.Config {
+	return *a.zibo.Config
 }
 func (a *App) OpenDirDialog() string {
 	res, _ := runtime.OpenDirectoryDialog(a.ctx, runtime.OpenDialogOptions{})
 	return res
 }
 
-func (a *App) FindZiboInstallationDetails() installer.ZiboInstallation {
+func (a *App) FindZiboInstallationDetails() utils.ZiboInstallation {
 	// find the zibo folder in the X-Plane directory
-	var foundPath, version string
-	_ = filepath.Walk(filepath.Join(a.config.XPlanePath, "aircraft"), func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err // prevent panic by handling failure accessing a path
-		}
-		if info.IsDir() && info.Name() == "zibomod" {
-			foundPath = path
-			return filepath.SkipDir // folder found, skip the rest of this directory
-		}
-		return nil
-	})
-	if foundPath != "" {
-		foundPath = filepath.Join(foundPath, "../", "../")
-		versionFilePath := filepath.Join(foundPath, "version.txt")
-
-		data, err := os.ReadFile(versionFilePath)
-		if err != nil {
-			log.Fatalf("Failed to read file: %v", err)
-		}
-		version = string(data)
-	}
-	rss := utils.NewRss("https://skymatixva.com/tfiles/feed.xml")
-	return installer.ZiboInstallation{
-		Path:          foundPath,
-		Version:       version,
-		RemoteVersion: rss.GetLatestVersion(),
-		BackupVersion: a.config.GetLastBackupVersion(),
-	}
+	return a.zibo.FindInstallationDetails()
 }
 
-func (a *App) BackupZiboInstallation(installation installer.ZiboInstallation) bool {
-	return a.config.Backup(installation)
+func (a *App) BackupZiboInstallation(installation utils.ZiboInstallation) bool {
+	return a.zibo.Backup(installation)
 }
 
-func (a *App) RestoreZiboInstallation(installation installer.ZiboInstallation) bool {
+func (a *App) RestoreZiboInstallation(installation utils.ZiboInstallation) bool {
 	if installation.Version == "" {
-		installation.Path = filepath.Join(a.config.XPlanePath, "Aircraft", "B737-800X")
+		installation.Path = filepath.Join(a.zibo.Config.XPlanePath, "Aircraft", "B737-800X")
 	}
-	return a.config.Restore(installation)
+	return a.zibo.Restore(installation)
 }
 
-func (a *App) FreshInstallZibo(installation installer.ZiboInstallation) {
+func (a *App) InstallZibo(installation utils.ZiboInstallation) {
 	if installation.Version == "" {
-		installation.Path = filepath.Join(a.config.XPlanePath, "Aircraft", "B737-800X")
+		installation.Path = filepath.Join(a.zibo.Config.XPlanePath, "Aircraft", "B737-800X")
 	} else {
-		a.config.RemoveOldInstalls(installation)
+		a.zibo.RemoveOldInstalls(installation)
 	}
-	a.config.Install(installation)
+	a.zibo.Install(installation)
 }
 
 func (a *App) DownloadZibo(fullInstall bool) bool {
-	return a.config.DownloadZibo(fullInstall)
+	return a.zibo.DownloadZibo(fullInstall)
 }
 
-func (a *App) UpdateZibo(installation installer.ZiboInstallation) {
-	a.config.Update(installation)
+func (a *App) UpdateZibo(installation utils.ZiboInstallation) {
+	a.zibo.Update(installation)
 }
 
 func (a *App) GetDownloadDetails(update bool) float64 {
-	return a.config.GetDownloadProgress(update)
+	return a.zibo.GetDownloadProgress(update)
 }

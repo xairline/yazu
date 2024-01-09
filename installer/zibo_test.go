@@ -9,44 +9,22 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// TestNewConfig tests the NewConfig function
-func TestNewConfig(t *testing.T) {
+// TestNewZibo tests the NewZibo function
+func TestNewZibo(t *testing.T) {
 	// This test should check if a new configuration is correctly created and read
 
 	// Setup: Create a temporary directory to simulate the user's home directory
 	tempDir := t.TempDir()
 	mockHomeDirGetter := utils.MockHomeDirGetter{HomeDir: tempDir}
 
-	// Act: Call NewConfig with the mock implementation
-	config := NewConfig(mockHomeDirGetter)
+	// Act: Call NewZibo with the mock implementation
+	config := NewZibo(mockHomeDirGetter)
 
 	// Assert: Check if the configuration was created correctly
-	assert.NotNil(t, config, "Config should not be nil")
+	assert.NotNil(t, config, "ZiboInstaller should not be nil")
 
 	os.RemoveAll(tempDir) // Clean up
 	_, err := os.Stat(tempDir)
-	assert.True(t, os.IsNotExist(err))
-}
-
-// TestSave tests the Save method of AppConfig
-func TestSave(t *testing.T) {
-	// This test should check if the configuration is correctly saved
-
-	// Setup: Create a temporary directory to simulate the user's home directory
-	tempDir := t.TempDir()
-	mockHomeDirGetter := utils.MockHomeDirGetter{HomeDir: tempDir}
-
-	// Act: Call NewConfig with the mock implementation
-	config := NewConfig(mockHomeDirGetter) // Override the HOME environment variable for the test
-
-	// Act: Call Save to save the configuration
-	err := config.Save()
-
-	// Assert: Check if the file was saved without errors
-	assert.Nil(t, err, "Save should not return an error")
-
-	os.RemoveAll(tempDir) // Clean up
-	_, err = os.Stat(tempDir)
 	assert.True(t, os.IsNotExist(err))
 }
 
@@ -57,8 +35,8 @@ func TestGetCachedVersions(t *testing.T) {
 		tempDir := t.TempDir()
 		mockHomeDirGetter := utils.MockHomeDirGetter{HomeDir: tempDir}
 
-		// Act: Call NewConfig with the mock implementation
-		config := NewConfig(mockHomeDirGetter) // Override the HOME environment variable for the test
+		// Act: Call NewZibo with the mock implementation
+		config := NewZibo(mockHomeDirGetter) // Override the HOME environment variable for the test
 
 		// create a file in the cache directory
 		cacheDir := tempDir + "/.yazu/cache"
@@ -85,8 +63,8 @@ func TestGetCachedVersions(t *testing.T) {
 		tempDir := t.TempDir()
 		mockHomeDirGetter := utils.MockHomeDirGetter{HomeDir: tempDir}
 
-		// Act: Call NewConfig with the mock implementation
-		config := NewConfig(mockHomeDirGetter) // Override the HOME environment variable for the test
+		// Act: Call NewZibo with the mock implementation
+		config := NewZibo(mockHomeDirGetter) // Override the HOME environment variable for the test
 
 		// create a file in the cache directory
 		cacheDir := tempDir + "/.yazu/cache"
@@ -113,8 +91,8 @@ func TestGetCachedVersions(t *testing.T) {
 		tempDir := t.TempDir()
 		mockHomeDirGetter := utils.MockHomeDirGetter{HomeDir: tempDir}
 
-		// Act: Call NewConfig with the mock implementation
-		config := NewConfig(mockHomeDirGetter) // Override the HOME environment variable for the test
+		// Act: Call NewZibo with the mock implementation
+		config := NewZibo(mockHomeDirGetter) // Override the HOME environment variable for the test
 
 		// create a file in the cache directory
 		cacheDir := tempDir + "/.yazu/cache"
@@ -142,8 +120,8 @@ func TestGetCachedVersions(t *testing.T) {
 		tempDir := t.TempDir()
 		mockHomeDirGetter := utils.MockHomeDirGetter{HomeDir: tempDir}
 
-		// Act: Call NewConfig with the mock implementation
-		config := NewConfig(mockHomeDirGetter) // Override the HOME environment variable for the test
+		// Act: Call NewZibo with the mock implementation
+		config := NewZibo(mockHomeDirGetter) // Override the HOME environment variable for the test
 
 		// create a file in the cache directory
 		cacheDir := tempDir + "/.yazu/cache"
@@ -174,8 +152,8 @@ func TestInstall(t *testing.T) {
 		tempDir := t.TempDir()
 		mockHomeDirGetter := utils.MockHomeDirGetter{HomeDir: tempDir}
 
-		// Act: Call NewConfig with the mock implementation
-		config := NewConfig(mockHomeDirGetter) // Override the HOME environment variable for the test
+		// Act: Call NewZibo with the mock implementation
+		config := NewZibo(mockHomeDirGetter) // Override the HOME environment variable for the test
 
 		// create a file in the cache directory
 		cacheDir := tempDir + "/.yazu/cache"
@@ -190,7 +168,7 @@ func TestInstall(t *testing.T) {
 		_, err = os.Create(cacheFile)
 		assert.Nil(t, err, "Error creating cache file")
 
-		config.Install(ZiboInstallation{
+		config.Install(utils.ZiboInstallation{
 			Path:          path.Join(tempDir, "Aircraft", "Zibo B738X"),
 			Version:       "",
 			RemoteVersion: "4.00.1",
@@ -206,8 +184,8 @@ func TestInstall(t *testing.T) {
 	//	tempDir := t.TempDir()
 	//	mockHomeDirGetter := MockHomeDirGetter{HomeDir: tempDir}
 	//
-	//	// Act: Call NewConfig with the mock implementation
-	//	config := NewConfig(mockHomeDirGetter) // Override the HOME environment variable for the test
+	//	// Act: Call NewZibo with the mock implementation
+	//	Config := NewZibo(mockHomeDirGetter) // Override the HOME environment variable for the test
 	//
 	//	// create a file in the cache directory
 	//	cacheDir := tempDir + "/.yazu/cache"
