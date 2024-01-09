@@ -1,0 +1,44 @@
+.app {
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    position: fixed;
+}
+
+body {
+    margin: 0;
+}
+
+.w-full {
+    width: 100vw;
+}
+
+/*.ant-tabs-tab {*/
+/*  color: #006363 !important;*/
+/*}*/
+
+.ant-tabs-tab-active {
+    color: #006363 !important;
+}
+
+.main-content {
+    /*background: url('/airport_night.jpg');*/
+    /*background-size: cover;*/
+}
+
+.ant-tabs-content-holder {
+    overflow: auto;
+    max-height: 100%; /* Adjust as needed */
+}
+
+.ant-tabs {
+    overflow: hidden;
+    max-height: 100%; /* Adjust as needed */
+}
+
+.xairline-floating-button {
+    position: fixed;
+    top: 10px; /* Adjust as needed */
+    left: 10px; /* Adjust as needed */
+    z-index: 1000; /* To ensure it stays on top */
+}
