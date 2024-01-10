@@ -1,8 +1,8 @@
-module changeme
+module github/xairline/yazu
 
 go 1.21
 
-toolchain go1.21.5
+toolchain go1.21.0
 
 require (
 	github.com/anacrolix/torrent v1.53.2
