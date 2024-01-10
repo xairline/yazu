@@ -47,8 +47,9 @@ jobs:
         shell: bash
         if: runner.os == 'macOS'
         run: |
-          npx create-dmg build/bin/yazu.app build/bin/yazu.dmg || true
-          rm -rf build/bin/yazu.app
+          npm install -g create-dmg
+          create-dmg build/bin/yazu.app build/bin/yazu.dmg || true
+          rm -rf build/bin/yazu.pkg build/bin/yazu.app.zip
       - name: Release
         uses: softprops/action-gh-release@v1
         #        if: startsWith(github.ref, 'refs/tags/')

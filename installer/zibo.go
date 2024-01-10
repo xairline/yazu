@@ -105,19 +105,7 @@ func (z *ZiboInstaller) Backup(installation utils.ZiboInstallation) (string, err
 }
 
 func (z *ZiboInstaller) Restore(installation utils.ZiboInstallation, backupPath string) error {
-	if runtimeOS := runtime.GOOS; runtimeOS == "darwin" {
-		// run shell cmd
-		script := fmt.Sprintf("do shell script \"sudo rm -rf '%s'\" with administrator privileges", installation.Path)
-		z.log.Info(script)
-		std, err := exec.Command("osascript", "-e", script).CombinedOutput()
-		if err != nil {
-			z.log.Error(err)
-			return err
-		}
-		z.log.Infof(string(std))
-	} else {
-		_ = os.RemoveAll(installation.Path)
-	}
+	z.RemoveOldInstalls(installation)
 
 	backupZip := filepath.Join(z.Config.YazuCachePath, "backup", installation.BackupVersion+".zip")
 	if backupPath != "" {
@@ -132,6 +120,10 @@ func (z *ZiboInstaller) unzip(src, dst string, fresh bool) {
 	// create a tmp directory
 	tmpDir := os.TempDir()
 	uuid := uuid.New().String()
+	if fresh {
+		uuid = uuid + "/B737-800X"
+		dst = filepath.Join(dst, "..")
+	}
 	tmpUnzipDir := filepath.Join(tmpDir, uuid)
 	_ = os.MkdirAll(tmpUnzipDir, 0700)
 
@@ -156,7 +148,7 @@ func (z *ZiboInstaller) unzip(src, dst string, fresh bool) {
 			os.MkdirAll(path, 0700)
 		} else {
 			f, err := os.OpenFile(
-				path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
+				path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0700)
 			if err != nil {
 				z.log.Errorf("Error creating file: %s", err)
 			}
@@ -168,23 +160,19 @@ func (z *ZiboInstaller) unzip(src, dst string, fresh bool) {
 			}
 		}
 	}
-
+	_ = ditto(tmpUnzipDir, dst)
+	_ = os.RemoveAll(tmpUnzipDir)
 	// move files from tmp directory to destination
-	if runtimeOS := runtime.GOOS; runtimeOS != "darwin" {
+	if runtimeOS := runtime.GOOS; runtimeOS == "darwin" {
 		// run shell cmd
-		if fresh {
-			uuid = uuid + "/B737-800X"
-		}
-		script := fmt.Sprintf("do shell script \"sudo mkdir -p '%s';sudo ditto '%s/%s' '%s';sudo xattr -d -r com.apple.quarantine '%s'; sudo rm -rf '%s'\" with administrator privileges", dst, tmpDir, uuid, dst, dst, tmpUnzipDir)
+		_ = os.MkdirAll(dst, 0700)
+		script := fmt.Sprintf("do shell script \"sudo xattr -d -r com.apple.quarantine '%s'\" with administrator privileges", dst)
 		z.log.Infof("Move files: %s", script)
 		std, err := exec.Command("osascript", "-e", script).CombinedOutput()
 		if err != nil {
 			z.log.Error(err)
 		}
 		z.log.Info(string(std))
-	} else {
-		_ = ditto(tmpUnzipDir, dst)
-		_ = os.RemoveAll(tmpUnzipDir)
 	}
 
 }
@@ -252,18 +240,21 @@ func (z *ZiboInstaller) GetLastBackupVersion() string {
 }
 
 func (z *ZiboInstaller) RemoveOldInstalls(installation utils.ZiboInstallation) {
+	if installation.Path == "" {
+		return
+	}
 	z.log.Infof("Removing %s", installation.Path)
+	_ = os.RemoveAll(installation.Path)
 	// if os is mac
 	if runtimeOS := runtime.GOOS; runtimeOS == "darwin" {
 		// run shell cmd
 		script := fmt.Sprintf("do shell script \"sudo rm -rf '%s'\" with administrator privileges", installation.Path)
 		std, err := exec.Command("osascript", "-e", script).CombinedOutput()
+		z.log.Infof("Remov old install: %s", script)
 		if err != nil {
 			z.log.Error(err)
 		}
 		z.log.Infof(string(std))
-	} else {
-		_ = os.RemoveAll(installation.Path)
 	}
 }
 
@@ -428,7 +419,7 @@ func copyFile(src, dst string) error {
 		return err
 	}
 
-	return os.Chmod(dst, sourceFileStat.Mode())
+	return os.Chmod(dst, 0700)
 }
 
 // ditto mimics the basic behavior of the 'ditto' command for directories.
@@ -454,7 +445,7 @@ func ditto(src, dst string) error {
 
 		if d.IsDir() {
 			// Create sub-directories.
-			return os.MkdirAll(targetPath, d.Type())
+			return os.MkdirAll(targetPath, 0700)
 		} else {
 			// Copy files.
 			return copyFile(path, targetPath)
