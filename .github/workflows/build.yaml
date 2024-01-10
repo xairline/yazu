@@ -17,12 +17,12 @@ jobs:
       fail-fast: false
       matrix:
         build:
-          - name: 'yazu'
-            platform: 'linux/amd64'
-            os: 'ubuntu-latest'
+#          - name: 'yazu'
+#            platform: 'linux/amd64'
+#            os: 'ubuntu-latest'
           - name: 'yazu'
             platform: 'darwin/universal,windows/amd64'
-            os: 'macos-latest'
+            os: 'macOS'
 
     runs-on: ${{ matrix.build.os }}
     steps:
