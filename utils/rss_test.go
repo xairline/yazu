@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -10,7 +11,7 @@ func TestFetchRssFeedValidURL(t *testing.T) {
 	// You should replace this with a URL you know is valid and stable for testing
 	validURL := "https://skymatixva.com/tfiles/feed.xml"
 
-	rss := NewRss(validURL)
+	rss := NewRss(validURL, logrus.New())
 	assert.NotNil(t, *rss)
 
 	fullInstallItems := rss.GetFullInstallItems()
@@ -32,7 +33,7 @@ func TestFetchRssFeedValidURL(t *testing.T) {
 func TestFetchRssFeedInvalidURL(t *testing.T) {
 	invalidURL := "http://thisisnotarealurl"
 
-	rss := NewRss(invalidURL)
+	rss := NewRss(invalidURL, logrus.New())
 	assert.Nil(t, rss)
 }
 

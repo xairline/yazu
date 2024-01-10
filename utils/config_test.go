@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"github.com/sirupsen/logrus"
 	"os"
 	"testing"
 
@@ -16,7 +17,7 @@ func TestNewConfig(t *testing.T) {
 	mockHomeDirGetter := MockHomeDirGetter{HomeDir: tempDir}
 
 	// Act: Call NewConfig with the mock implementation
-	config := GetConfig(mockHomeDirGetter)
+	config := GetConfig(mockHomeDirGetter, false, logrus.New())
 
 	// Assert: Check if the configuration was created correctly
 	assert.NotNil(t, config, "Config should not be nil")
@@ -35,7 +36,7 @@ func TestSave(t *testing.T) {
 	mockHomeDirGetter := MockHomeDirGetter{HomeDir: tempDir}
 
 	// Act: Call NewConfig with the mock implementation
-	config := GetConfig(mockHomeDirGetter) // Override the HOME environment variable for the test
+	config := GetConfig(mockHomeDirGetter, false, logrus.New()) // Override the HOME environment variable for the test
 
 	// Act: Call Save to save the configuration
 	err := config.Save()

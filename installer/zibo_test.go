@@ -1,8 +1,9 @@
 package installer
 
 import (
-	"changeme/utils"
 	uuid2 "github.com/google/uuid"
+	"github.com/sirupsen/logrus"
+	"github/xairline/yazu/utils"
 	"os"
 	"path"
 	"testing"
@@ -19,7 +20,7 @@ func setup(t *testing.T) (*ZiboInstaller, string) {
 	mockHomeDirGetter := utils.MockHomeDirGetter{HomeDir: tempDir}
 
 	// Act: Call NewZibo with the mock implementation
-	return NewZibo(mockHomeDirGetter, false), tempDir
+	return NewZibo(mockHomeDirGetter, false, logrus.New()), tempDir
 }
 
 // TestNewZibo tests the NewZibo function

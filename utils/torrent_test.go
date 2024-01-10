@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"os"
@@ -16,7 +17,7 @@ func TestTorrentDownloadAndStop(t *testing.T) {
 	}
 
 	// Initialize TorrentManager with the temp directory
-	manager := NewTorrentManager("https://skymatixva.com/tfiles/feed.xml")
+	manager := NewTorrentManager("https://skymatixva.com/tfiles/feed.xml", logrus.New())
 	manager.DownloadPath = tmpDir
 
 	// Start a torrent download
