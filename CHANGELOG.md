@@ -1,3 +1,12 @@
+## [0.0.1-alpha.25](https://github.com/xairline/yazu/compare/v0.0.1-alpha.24...v0.0.1-alpha.25) (2024-01-10)
+
+
+### Features
+
+* ci test ([5b488fd](https://github.com/xairline/yazu/commit/5b488fdd3ad6d79fb77870244787a86894d168b3))
+
+
+
 ## [0.0.1-alpha.24](https://github.com/xairline/yazu/compare/v0.0.1-alpha.23...v0.0.1-alpha.24) (2024-01-10)
 
 
