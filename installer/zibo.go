@@ -386,6 +386,10 @@ func (z *ZiboInstaller) GetLiveries(installationDetails utils.ZiboInstallation) 
 
 func (z *ZiboInstaller) GetAvailableLiveries() []AvailableLivery {
 	var res []AvailableLivery
+	//browser := rod.New().MustConnect()
+	//page := browser.MustPage("https://forums.x-plane.org/index.php?/files/category/209-zibo-737/")
+	//tmp := page.MustWaitLoad().MustEval("()=>Array.from(document.querySelectorAll(\"li.ipsDataItem.ipsDataItem_unread\")).map(li => li.textContent)")
+	//log.Printf("%v", tmp)
 	return res
 }
 
