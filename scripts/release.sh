@@ -1,4 +1,9 @@
 set -e
+if [ -z "$1" ]
+  then
+    echo "No argument supplied"
+    exit 1
+fi
 
 rm -rf build/bin
 wails build --platform darwin/universal
