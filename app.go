@@ -1,11 +1,11 @@
 package main
 
 import (
-	"changeme/installer"
-	"changeme/utils"
 	"context"
 	"github.com/sirupsen/logrus"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
+	"github/xairline/yazu/installer"
+	"github/xairline/yazu/utils"
 	"io"
 	"os"
 	"path/filepath"

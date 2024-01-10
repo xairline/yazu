@@ -2,13 +2,13 @@ package installer
 
 import (
 	"archive/zip"
-	"changeme/utils"
 	"context"
 	"encoding/base64"
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/saracen/fastzip"
 	"github.com/sirupsen/logrus"
+	"github/xairline/yazu/utils"
 	"io"
 	"io/fs"
 	"os"
