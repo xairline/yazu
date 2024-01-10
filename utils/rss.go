@@ -2,7 +2,7 @@ package utils
 
 import (
 	"encoding/xml"
-	"github.com/labstack/gommon/log"
+	"github.com/sirupsen/logrus"
 	"io"
 	"net/http"
 	"regexp"
@@ -15,6 +15,7 @@ type Rss struct {
 	Version string   `xml:"version,attr"`
 	Channel Channel  `xml:"channel"`
 	Url     string
+	log     *logrus.Logger
 }
 
 type Channel struct {
@@ -32,7 +33,7 @@ type Item struct {
 	//PubDate     string `xml:"pubDate"`
 }
 
-func GetRss(url string) *Rss {
+func GetRss(url string, log *logrus.Logger) *Rss {
 	// Fetch the RSS feed
 	resp, err := http.Get(url)
 	if err != nil {
@@ -56,11 +57,12 @@ func GetRss(url string) *Rss {
 		return nil
 	}
 	rss.Url = url
+	rss.log = log
 	return &rss
 }
 
-func NewRss(url string) *Rss {
-	return GetRss(url)
+func NewRss(url string, log *logrus.Logger) *Rss {
+	return GetRss(url, log)
 }
 
 func (r *Rss) GetFullInstallItems() *[]Item {

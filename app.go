@@ -4,8 +4,10 @@ import (
 	"changeme/installer"
 	"changeme/utils"
 	"context"
+	"github.com/sirupsen/logrus"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
-	"log"
+	"io"
+	"os"
 	"path/filepath"
 )
 
@@ -13,6 +15,7 @@ import (
 type App struct {
 	ctx  context.Context
 	zibo *installer.ZiboInstaller
+	Log  *logrus.Logger
 }
 
 type DownloadInfo struct {
@@ -22,8 +25,20 @@ type DownloadInfo struct {
 
 // NewApp creates a new App application struct
 func NewApp() *App {
+	log := logrus.New()
+	zibo := installer.NewZibo(utils.RealHomeDirGetter{}, true, log)
+
+	file, err := os.OpenFile(
+		filepath.Join(zibo.Config.YazuCachePath, "..", "yazu.log"),
+		os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatal("Failed to log to file, using default stderr")
+	}
+	log.SetOutput(io.MultiWriter(file, os.Stdout))
+
 	return &App{
-		zibo: installer.NewZibo(utils.RealHomeDirGetter{}, true),
+		zibo: zibo,
+		Log:  log,
 	}
 }
 
@@ -34,11 +49,11 @@ func (a *App) startup(ctx context.Context) {
 }
 
 func (a *App) IsXPlanePathConfigured() bool {
-	config := utils.GetConfig(utils.RealHomeDirGetter{}, true)
+	config := utils.GetConfig(utils.RealHomeDirGetter{}, true, a.Log)
 	return config.CheckXPlanePath(a.zibo.Config.XPlanePath)
 }
 func (a *App) CheckXPlanePath(dirPath string) bool {
-	config := utils.GetConfig(utils.RealHomeDirGetter{}, true)
+	config := utils.GetConfig(utils.RealHomeDirGetter{}, true, a.Log)
 	return config.CheckXPlanePath(dirPath)
 }
 func (a *App) GetConfig() utils.Config {
@@ -78,7 +93,7 @@ func (a *App) InstallZibo(installation utils.ZiboInstallation, zipPath string) {
 
 func (a *App) DownloadZibo(fullInstall bool) DownloadInfo {
 	isDownloading, zipFilePath := a.zibo.DownloadZibo(fullInstall)
-	log.Printf("isDownloading: %v, zipFilePath: %v", isDownloading, zipFilePath)
+	a.Log.Printf("isDownloading: %v, zipFilePath: %v", isDownloading, zipFilePath)
 	res := DownloadInfo{
 		IsDownloading: isDownloading,
 		Path:          zipFilePath,

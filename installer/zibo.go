@@ -8,9 +8,9 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/saracen/fastzip"
+	"github.com/sirupsen/logrus"
 	"io"
 	"io/fs"
-	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -23,6 +23,7 @@ type ZiboInstaller struct {
 	TorrentManager *utils.TorrentManager
 	rss            *utils.Rss
 	Config         *utils.Config
+	log            *logrus.Logger
 }
 
 type ZiboBackup struct {
@@ -45,12 +46,13 @@ type AvailableLivery struct {
 	Icon   string `json:"icon"`
 }
 
-func NewZibo(homeDirGetter utils.HomeDirGetter, singleton bool) *ZiboInstaller {
-	config := utils.GetConfig(homeDirGetter, singleton)
+func NewZibo(homeDirGetter utils.HomeDirGetter, singleton bool, log *logrus.Logger) *ZiboInstaller {
+	config := utils.GetConfig(homeDirGetter, singleton, log)
 	return &ZiboInstaller{
-		TorrentManager: utils.NewTorrentManager(config.YazuCachePath),
-		rss:            utils.NewRss("https://skymatixva.com/tfiles/feed.xml"),
+		TorrentManager: utils.NewTorrentManager(config.YazuCachePath, log),
+		rss:            utils.NewRss("https://skymatixva.com/tfiles/feed.xml", log),
 		Config:         config,
+		log:            log,
 	}
 }
 
@@ -67,7 +69,7 @@ func (z *ZiboInstaller) Backup(installation utils.ZiboInstallation) (string, err
 	if _, err := os.Stat(backupDir); os.IsNotExist(err) {
 		err := os.MkdirAll(backupDir, 0755) // Creates the directory with read, write, and execute permissions for the user
 		if err != nil {
-			log.Printf("Error creating Config directory: %s", err)
+			z.log.Errorf("Error creating Config directory: %s", err)
 			return "", err
 		}
 	}
@@ -106,13 +108,13 @@ func (z *ZiboInstaller) Restore(installation utils.ZiboInstallation, backupPath 
 	if runtimeOS := runtime.GOOS; runtimeOS == "darwin" {
 		// run shell cmd
 		script := fmt.Sprintf("do shell script \"sudo rm -rf '%s'\" with administrator privileges", installation.Path)
-		log.Println(script)
+		z.log.Info(script)
 		std, err := exec.Command("osascript", "-e", script).CombinedOutput()
 		if err != nil {
-			log.Println(err)
+			z.log.Error(err)
 			return err
 		}
-		log.Println(string(std))
+		z.log.Infof(string(std))
 	} else {
 		_ = os.RemoveAll(installation.Path)
 	}
@@ -130,21 +132,22 @@ func (z *ZiboInstaller) unzip(src, dst string, fresh bool) {
 	// create a tmp directory
 	tmpDir := os.TempDir()
 	uuid := uuid.New().String()
-	_ = os.MkdirAll(filepath.Join(tmpDir, uuid), 0700)
+	tmpUnzipDir := filepath.Join(tmpDir, uuid)
+	_ = os.MkdirAll(tmpUnzipDir, 0700)
 
 	// Create new extractor
-	log.Println("Extracting archive..." + src)
+	z.log.Infof("Extracting archive..." + src)
 
 	r, err := zip.OpenReader(src)
 	if err != nil {
-		log.Fatalf("Error opening zip file: %s", err)
+		z.log.Errorf("Error opening zip file: %s", err)
 	}
 	defer r.Close()
 
 	for _, f := range r.File {
 		rc, err := f.Open()
 		if err != nil {
-			log.Fatalf("Error opening file in zip: %s", err)
+			z.log.Errorf("Error opening file in zip: %s", err)
 		}
 		defer rc.Close()
 
@@ -155,32 +158,33 @@ func (z *ZiboInstaller) unzip(src, dst string, fresh bool) {
 			f, err := os.OpenFile(
 				path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
 			if err != nil {
-				log.Fatalf("Error creating file: %s", err)
+				z.log.Errorf("Error creating file: %s", err)
 			}
 			defer f.Close()
 
 			_, err = io.Copy(f, rc)
 			if err != nil {
-				log.Fatalf("Error copying file contents: %s", err)
+				z.log.Errorf("Error copying file contents: %s", err)
 			}
 		}
 	}
 
 	// move files from tmp directory to destination
-	if runtimeOS := runtime.GOOS; runtimeOS == "darwin" {
+	if runtimeOS := runtime.GOOS; runtimeOS != "darwin" {
 		// run shell cmd
 		if fresh {
 			uuid = uuid + "/B737-800X"
 		}
-		script := fmt.Sprintf("do shell script \"sudo ditto '%s/%s' '%s';sudo xattr -d -r com.apple.quarantine '%s'\" with administrator privileges", tmpDir, uuid, dst, dst)
-		log.Printf("Move files: %s", script)
+		script := fmt.Sprintf("do shell script \"sudo mkdir -p '%s';sudo ditto '%s/%s' '%s';sudo xattr -d -r com.apple.quarantine '%s'; sudo rm -rf '%s'\" with administrator privileges", dst, tmpDir, uuid, dst, dst, tmpUnzipDir)
+		z.log.Infof("Move files: %s", script)
 		std, err := exec.Command("osascript", "-e", script).CombinedOutput()
 		if err != nil {
-			log.Println(err)
+			z.log.Error(err)
 		}
-		log.Println(string(std))
+		z.log.Info(string(std))
 	} else {
-		_ = ditto(filepath.Join(tmpDir, "B737-800X"), dst)
+		_ = ditto(tmpUnzipDir, dst)
+		_ = os.RemoveAll(tmpUnzipDir)
 	}
 
 }
@@ -188,6 +192,7 @@ func (z *ZiboInstaller) unzip(src, dst string, fresh bool) {
 func (z *ZiboInstaller) GetBackups() []ZiboBackup {
 	var backups []ZiboBackup
 	backupDir := filepath.Join(z.Config.YazuCachePath, "backup")
+	z.log.Infof("Getting backups from %s", backupDir)
 	_ = filepath.Walk(backupDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -216,7 +221,7 @@ func (z *ZiboInstaller) GetBackups() []ZiboBackup {
 		}
 		return nil
 	})
-
+	z.log.Infof("Found %d backups", len(backups))
 	return backups
 }
 
@@ -247,16 +252,16 @@ func (z *ZiboInstaller) GetLastBackupVersion() string {
 }
 
 func (z *ZiboInstaller) RemoveOldInstalls(installation utils.ZiboInstallation) {
-	log.Printf("Removing %s", installation.Path)
+	z.log.Infof("Removing %s", installation.Path)
 	// if os is mac
 	if runtimeOS := runtime.GOOS; runtimeOS == "darwin" {
 		// run shell cmd
 		script := fmt.Sprintf("do shell script \"sudo rm -rf '%s'\" with administrator privileges", installation.Path)
 		std, err := exec.Command("osascript", "-e", script).CombinedOutput()
 		if err != nil {
-			log.Println(err)
+			z.log.Error(err)
 		}
-		log.Println(string(std))
+		z.log.Infof(string(std))
 	} else {
 		_ = os.RemoveAll(installation.Path)
 	}
@@ -274,21 +279,21 @@ func (z *ZiboInstaller) DownloadZibo(fullInstall bool) (bool, string) {
 	}
 	isDownloading := false
 
-	log.Printf("Downloading %s, from: %s", installItem.Version, installItem.Link)
+	z.log.Infof("Downloading %s, from: %s", installItem.Version, installItem.Link)
 	subPath := "full"
 	if !fullInstall {
 		subPath = "patch/"
 	}
 	err := z.TorrentManager.AddTorrent(installItem.Link, subPath)
 	if err != nil {
-		log.Printf("Error downloading torrent: %s", err)
+		z.log.Infof("Error downloading torrent: %s", err)
 	}
 	download := z.TorrentManager.Downloads[installItem.Link]
 	files := download.Torrent.Files()
 	file := files[0]
 	zipFilePath = filepath.Join(z.TorrentManager.DownloadPath, subPath, file.Path())
 	if err != nil {
-		log.Printf("Error downloading torrent: %s", err)
+		z.log.Infof("Error downloading torrent: %s", err)
 	}
 	isDownloading = true
 
@@ -328,6 +333,7 @@ func (z *ZiboInstaller) FindInstallationDetails() utils.ZiboInstallation {
 			return err // prevent panic by handling failure accessing a path
 		}
 		if info.IsDir() && info.Name() == "zibomod" {
+			z.log.Infof("Found zibo(mob) at: %s", path)
 			foundPath = path
 			return filepath.SkipDir // folder found, skip the rest of this directory
 		}
@@ -335,12 +341,13 @@ func (z *ZiboInstaller) FindInstallationDetails() utils.ZiboInstallation {
 	})
 	if foundPath != "" {
 		foundPath = filepath.Join(foundPath, "../", "../")
+		z.log.Infof("Found zibo at: %s", foundPath)
 		res.Path = foundPath
 		versionFilePath := filepath.Join(foundPath, "version.txt")
 
 		data, err := os.ReadFile(versionFilePath)
 		if err != nil {
-			log.Printf("Failed to read file: %v", err)
+			z.log.Errorf("Failed to read file: %v", err)
 		}
 		res.Version = string(data)
 	}
@@ -362,7 +369,7 @@ func (z *ZiboInstaller) GetLiveries(installationDetails utils.ZiboInstallation) 
 				if strings.LastIndex(path, "icon11.png") != -1 {
 					imageBytes, err := os.ReadFile(path)
 					if err != nil {
-						log.Fatal(err)
+						z.log.Error(err)
 					}
 
 					// Encode the bytes to Base64

@@ -19,6 +19,8 @@
         <string>iconfile</string>
         <key>LSMinimumSystemVersion</key>
         <string>10.13.0</string>
+        <key>NSRemovableVolumesUsageDescription</key>
+        <string>MacOS 10.14+ enforces access on external drive. If your XPlane is on an external drive, you will need this</string>
         <key>NSHighResolutionCapable</key>
         <string>true</string>
         <key>NSHumanReadableCopyright</key>

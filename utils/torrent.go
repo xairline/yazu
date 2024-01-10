@@ -3,6 +3,7 @@ package utils
 import (
 	"fmt"
 	"github.com/anacrolix/torrent"
+	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -19,12 +20,14 @@ type TorrentDownload struct {
 type TorrentManager struct {
 	Downloads    map[string]*TorrentDownload
 	DownloadPath string
+	log          *logrus.Logger
 }
 
-func NewTorrentManager(path string) *TorrentManager {
+func NewTorrentManager(path string, log *logrus.Logger) *TorrentManager {
 	return &TorrentManager{
 		Downloads:    make(map[string]*TorrentDownload),
 		DownloadPath: path,
+		log:          log,
 	}
 }
 

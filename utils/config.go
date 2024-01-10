@@ -1,9 +1,9 @@
 package utils
 
 import (
+	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 	"io/ioutil"
-	"log"
 	"os"
 	"path"
 	"path/filepath"
@@ -24,6 +24,7 @@ type Config struct {
 	torrentManager *TorrentManager
 	mu             sync.Mutex
 	rss            *Rss
+	log            *logrus.Logger
 }
 
 var (
@@ -34,17 +35,17 @@ var (
 )
 
 // GetConfig returns the singleton instance of Config.
-func GetConfig(homeDirGetter HomeDirGetter, singleton bool) *Config {
+func GetConfig(homeDirGetter HomeDirGetter, singleton bool, log *logrus.Logger) *Config {
 	if !singleton {
-		return newConfig(homeDirGetter)
+		return newConfig(homeDirGetter, log)
 	}
 	once.Do(func() {
-		instance = newConfig(homeDirGetter)
+		instance = newConfig(homeDirGetter, log)
 	})
 	return instance
 }
 
-func newConfig(homeDirGetter HomeDirGetter) *Config {
+func newConfig(homeDirGetter HomeDirGetter, log *logrus.Logger) *Config {
 	// check if config file exists
 	homeDir, err := homeDirGetter.UserHomeDir()
 	if err != nil {
@@ -88,8 +89,9 @@ func newConfig(homeDirGetter HomeDirGetter) *Config {
 		log.Fatalf("Error unmarshaling config data: %s", err)
 	}
 
-	config.torrentManager = NewTorrentManager(config.YazuCachePath)
-	config.rss = NewRss("https://skymatixva.com/tfiles/feed.xml")
+	config.torrentManager = NewTorrentManager(config.YazuCachePath, log)
+	config.rss = NewRss("https://skymatixva.com/tfiles/feed.xml", log)
+	config.log = log
 	return config
 }
 
@@ -109,7 +111,11 @@ func (c *Config) CheckXPlanePath(dirPath string) bool {
 			if strings.Contains(path, "Log.txt") {
 				// store path in home directory
 				c.XPlanePath = filepath.Dir(path)
-				_ = c.Save()
+				err = c.Save()
+				if err != nil {
+					c.log.Errorf("Error saving config: %v", err)
+				}
+				c.log.Infof("Found X-Plane path: %s", c.XPlanePath)
 				found = true
 			}
 		}
@@ -133,7 +139,7 @@ func (c *Config) Save() error {
 	// Write the config file
 	configFilePath, err := os.UserHomeDir()
 	if err != nil {
-		log.Fatalf("failed to get user home directory: %v", err)
+		c.log.Fatalf("failed to get user home directory: %v", err)
 	}
 	configFilePath += "/.yazu/config.yaml"
 	if err := os.WriteFile(configFilePath, data, 0644); err != nil {

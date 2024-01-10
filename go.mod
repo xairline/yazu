@@ -7,8 +7,8 @@ toolchain go1.21.0
 require (
 	github.com/anacrolix/torrent v1.53.2
 	github.com/google/uuid v1.3.0
-	github.com/labstack/gommon v0.4.0
 	github.com/saracen/fastzip v0.1.11
+	github.com/sirupsen/logrus v1.4.2
 	github.com/stretchr/testify v1.8.3
 	github.com/wailsapp/wails/v2 v2.7.1
 	gopkg.in/yaml.v3 v3.0.1
@@ -52,7 +52,9 @@ require (
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/jchv/go-winloader v0.0.0-20210711035445-715c2860da7e // indirect
 	github.com/klauspost/compress v1.16.5 // indirect
+	github.com/konsorten/go-windows-terminal-sequences v1.0.1 // indirect
 	github.com/labstack/echo/v4 v4.10.2 // indirect
+	github.com/labstack/gommon v0.4.0 // indirect
 	github.com/leaanthony/go-ansi-parser v1.6.0 // indirect
 	github.com/leaanthony/gosod v1.0.3 // indirect
 	github.com/leaanthony/slicer v1.6.0 // indirect
