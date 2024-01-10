@@ -22,7 +22,8 @@ jobs:
             os: 'ubuntu-latest'
           - name: 'yazu'
             platform: 'darwin/universal,windows/amd64'
-            os: 'macos-latest'
+            os: 'macOS'
+#            os: 'macos-latest'
 
     runs-on: ${{ matrix.build.os }}
     steps:
