@@ -32,7 +32,7 @@ func NewApp() *App {
 		filepath.Join(zibo.Config.YazuCachePath, "..", "yazu.log"),
 		os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
-		log.Fatal("Failed to log to file, using default stderr")
+		log.Error("Failed to log to file, using default stderr")
 	}
 	log.SetOutput(io.MultiWriter(file, os.Stdout))
 
