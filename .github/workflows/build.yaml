@@ -20,11 +20,8 @@ jobs:
           - name: 'yazu'
             platform: 'linux/amd64'
             os: 'ubuntu-latest'
-          - name: 'yazu.exe'
-            platform: 'windows/amd64'
-            os: 'windows-latest'
           - name: 'yazu'
-            platform: 'darwin/universal'
+            platform: 'darwin/universal,windows/amd64'
             os: 'macos-latest'
 
     runs-on: ${{ matrix.build.os }}
@@ -47,8 +44,7 @@ jobs:
         shell: bash
         if: runner.os == 'macOS'
         run: |
-          npm install -g create-dmg
-          create-dmg build/bin/yazu.app build/bin/yazu.dmg || true
+          npx --yes create-dmg build/bin/yazu.app build/bin/yazu.dmg || true
           rm -rf build/bin/yazu.pkg build/bin/yazu.app.zip
       - name: Release
         uses: softprops/action-gh-release@v1
