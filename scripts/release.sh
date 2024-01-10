@@ -2,7 +2,7 @@ set -e
 wails build --platform darwin/universal
 npx --yes create-dmg build/bin/yazu.app build/bin --overwrite || true
 
-version=$(npm version $@) # Adjust as needed
+version=$(npm version $@ --no-git-tag-version) # Adjust as needed
 git tag version
 
 rm -rf build/bin/yazu_*.dmg
