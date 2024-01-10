@@ -19,5 +19,5 @@ npx --yes gh-release \
   -y -c main \
   -n ${version} \
   -o xairline \
-  -r yet-anther-zibo-updater
+  -r yet-another-zibo-updater
 git push && git push --tags
