@@ -101,3 +101,12 @@ func (a *App) GetBackups() []installer.ZiboBackup {
 func (a *App) GetCachedFiles() []utils.CachedFile {
 	return a.zibo.TorrentManager.GetCachedFiles()
 }
+
+func (a *App) GetLiveries(installation utils.ZiboInstallation) []installer.InstalledLivery {
+	return a.zibo.GetLiveries(installation)
+}
+
+func (a *App) GetAvailableLiveries() []installer.AvailableLivery {
+	return a.zibo.GetAvailableLiveries()
+
+}

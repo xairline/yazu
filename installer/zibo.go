@@ -4,6 +4,7 @@ import (
 	"archive/zip"
 	"changeme/utils"
 	"context"
+	"encoding/base64"
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/saracen/fastzip"
@@ -31,6 +32,19 @@ type ZiboBackup struct {
 	Size       int    `json:"size"`
 }
 
+type InstalledLivery struct {
+	Name string `json:"name"`
+	Path string `json:"path"`
+	Icon string `json:"icon"`
+}
+
+type AvailableLivery struct {
+	Name   string `json:"name"`
+	Url    string `json:"url"`
+	Source string `json:"source"`
+	Icon   string `json:"icon"`
+}
+
 func NewZibo(homeDirGetter utils.HomeDirGetter, singleton bool) *ZiboInstaller {
 	config := utils.GetConfig(homeDirGetter, singleton)
 	return &ZiboInstaller{
@@ -53,7 +67,8 @@ func (z *ZiboInstaller) Backup(installation utils.ZiboInstallation) (string, err
 	if _, err := os.Stat(backupDir); os.IsNotExist(err) {
 		err := os.MkdirAll(backupDir, 0755) // Creates the directory with read, write, and execute permissions for the user
 		if err != nil {
-			log.Fatalf("Error creating Config directory: %s", err)
+			log.Printf("Error creating Config directory: %s", err)
+			return "", err
 		}
 	}
 	// current epoch time
@@ -265,12 +280,15 @@ func (z *ZiboInstaller) DownloadZibo(fullInstall bool) (bool, string) {
 		subPath = "patch/"
 	}
 	err := z.TorrentManager.AddTorrent(installItem.Link, subPath)
+	if err != nil {
+		log.Printf("Error downloading torrent: %s", err)
+	}
 	download := z.TorrentManager.Downloads[installItem.Link]
 	files := download.Torrent.Files()
 	file := files[0]
 	zipFilePath = filepath.Join(z.TorrentManager.DownloadPath, subPath, file.Path())
 	if err != nil {
-		log.Fatalf("Error downloading torrent: %s", err)
+		log.Printf("Error downloading torrent: %s", err)
 	}
 	isDownloading = true
 
@@ -326,6 +344,48 @@ func (z *ZiboInstaller) FindInstallationDetails() utils.ZiboInstallation {
 		}
 		res.Version = string(data)
 	}
+	return res
+}
+
+func (z *ZiboInstaller) GetLiveries(installationDetails utils.ZiboInstallation) []InstalledLivery {
+	var res []InstalledLivery
+	_ = filepath.Walk(filepath.Join(installationDetails.Path, "liveries"), func(myPath string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err // prevent panic by handling failure accessing a path
+		}
+		if info.IsDir() && myPath != filepath.Join(installationDetails.Path, "liveries") {
+			// list png files
+			_ = filepath.Walk(myPath, func(path string, myInfo os.FileInfo, err error) error {
+				if myInfo.IsDir() && path != myPath {
+					return filepath.SkipDir // folder found, skip the rest of this directory
+				}
+				if strings.LastIndex(path, "icon11.png") != -1 {
+					imageBytes, err := os.ReadFile(path)
+					if err != nil {
+						log.Fatal(err)
+					}
+
+					// Encode the bytes to Base64
+					base64Encoding := base64.StdEncoding.EncodeToString(imageBytes)
+					res = append(res, InstalledLivery{
+						Name: info.Name(),
+						Path: myPath,
+						Icon: base64Encoding,
+					})
+					return filepath.SkipDir // folder found, skip the rest of this directory
+				}
+				return nil
+			})
+			return filepath.SkipDir // folder found, skip the rest of this directory
+		}
+		return nil
+	})
+
+	return res
+}
+
+func (z *ZiboInstaller) GetAvailableLiveries() []AvailableLivery {
+	var res []AvailableLivery
 	return res
 }
 

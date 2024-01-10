@@ -18,6 +18,10 @@ export function FindZiboInstallationDetails() {
   return window['go']['main']['App']['FindZiboInstallationDetails']();
 }
 
+export function GetAvailableLiveries() {
+  return window['go']['main']['App']['GetAvailableLiveries']();
+}
+
 export function GetBackups() {
   return window['go']['main']['App']['GetBackups']();
 }
@@ -32,6 +36,10 @@ export function GetConfig() {
 
 export function GetDownloadDetails(arg1) {
   return window['go']['main']['App']['GetDownloadDetails'](arg1);
+}
+
+export function GetLiveries(arg1) {
+  return window['go']['main']['App']['GetLiveries'](arg1);
 }
 
 export function InstallZibo(arg1, arg2) {

@@ -1,17 +1,21 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Card, Col, Descriptions, Divider, Row, Spin, Table} from 'antd'
+import {Button, Card, Col, Descriptions, Divider, Row, Spin, Table, Tabs} from 'antd'
 // import {FindZiboInstallationDetails} from "../../wailsjs/go/main/App";
 import {
     BackupZiboInstallation,
     DownloadZibo,
     FindZiboInstallationDetails,
+    GetAvailableLiveries,
     GetDownloadDetails,
+    GetLiveries,
     InstallZibo,
     RestoreZiboInstallation,
     UpdateZibo
 } from "../../wailsjs/go/main/App";
-import {utils} from "../../wailsjs/go/models";
+import {installer, utils} from "../../wailsjs/go/models";
 import ZiboInstallation = utils.ZiboInstallation;
+import InstalledLivery = installer.InstalledLivery;
+import AvailableLivery = installer.AvailableLivery;
 
 
 function Zibo() {
@@ -19,16 +23,22 @@ function Zibo() {
     const [running, setRunning] = useState(false);
     const [ziboDetails, setZiboDetails] = useState({} as ZiboInstallation);
     const [progressDetails, setProgressDetails] = useState("")
+    const [installedLiveries, setInstalledLiveries] = useState([] as InstalledLivery[]);
+    const [availableLiveries, setAvailableLiveries] = useState([] as AvailableLivery[]);
     useEffect(() => {
         const fetchDetails = async () => {
             const details = await FindZiboInstallationDetails();
+            const liveries = await GetLiveries(details);
+            const availableLiveries = await GetAvailableLiveries();
+            setAvailableLiveries(availableLiveries)
+            setInstalledLiveries(liveries);
             setZiboDetails(details)
         };
         // Call it once immediately
         fetchDetails();
 
         // Set an interval to call it every 30 seconds
-        const interval = setInterval(fetchDetails, 3000);
+        const interval = setInterval(fetchDetails, 30000);
 
         // Clear the interval when the component is unmounted
         return () => clearInterval(interval);
@@ -162,10 +172,71 @@ function Zibo() {
                     </Col>
                     <Divider/>
                     <Col span={24}>
-                        <Table
-                            title={() => "Liveries"}
-                        />
+                        <Tabs items={[
+                            {
+                                label: "Installed Liveries",
+                                key: "installedLiveries",
+                                children: <Table
+                                    title={() => "Liveries"}
+                                    dataSource={installedLiveries}
+                                    style={{overflow: "scroll"}}
+                                    columns={[
+                                        {
+                                            title: 'Icon',
+                                            dataIndex: 'icon',
+                                            key: 'icon',
+                                            render: (icon: string) => <img src={`data:image/png;base64,${icon}`}
+                                                                           alt={"icon"}
+                                                                           width={160} height={90}/>
+                                        },
+                                        {
+                                            title: 'Name',
+                                            dataIndex: 'name',
+                                            key: 'name',
+                                        },
+                                        // {
+                                        //     title: 'Installed Path',
+                                        //     dataIndex: 'path',
+                                        //     key: 'path',
+                                        // },
+                                    ]}
+                                />,
+                            },
+                            {
+                                label: "Available Liveries",
+                                key: "availableLiveries",
+                                children: <Table
+                                    title={() => "Liveries"}
+                                    dataSource={availableLiveries}
+                                    style={{overflow: "scroll"}}
+                                    columns={[
+                                        {
+                                            title: 'Icon',
+                                            dataIndex: 'icon',
+                                            key: 'icon',
+                                            render: (icon: string) => <img src={`data:image/png;base64,${icon}`}
+                                                                           alt={"icon"}
+                                                                           width={160} height={90}/>
+                                        },
+                                        {
+                                            title: 'Name',
+                                            dataIndex: 'name',
+                                            key: 'name',
+                                        },
+                                        // {
+                                        //     title: 'Installed Path',
+                                        //     dataIndex: 'path',
+                                        //     key: 'path',
+                                        // },
+                                    ]}
+                                />,
+                            },
+                        ]}>
+
+                        </Tabs>
+
                     </Col>
+
                 </Row>
             </Spin>
         </Card>

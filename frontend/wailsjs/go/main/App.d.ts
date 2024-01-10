@@ -12,6 +12,8 @@ export function DownloadZibo(arg1:boolean):Promise<main.DownloadInfo>;
 
 export function FindZiboInstallationDetails():Promise<utils.ZiboInstallation>;
 
+export function GetAvailableLiveries():Promise<Array<installer.AvailableLivery>>;
+
 export function GetBackups():Promise<Array<installer.ZiboBackup>>;
 
 export function GetCachedFiles():Promise<Array<utils.CachedFile>>;
@@ -19,6 +21,8 @@ export function GetCachedFiles():Promise<Array<utils.CachedFile>>;
 export function GetConfig():Promise<utils.Config>;
 
 export function GetDownloadDetails(arg1:boolean):Promise<number>;
+
+export function GetLiveries(arg1:utils.ZiboInstallation):Promise<Array<installer.InstalledLivery>>;
 
 export function InstallZibo(arg1:utils.ZiboInstallation,arg2:string):Promise<void>;
 

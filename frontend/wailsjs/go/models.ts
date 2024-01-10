@@ -1,5 +1,39 @@
 export namespace installer {
 	
+	export class AvailableLivery {
+	    name: string;
+	    url: string;
+	    source: string;
+	    icon: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new AvailableLivery(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = source["name"];
+	        this.url = source["url"];
+	        this.source = source["source"];
+	        this.icon = source["icon"];
+	    }
+	}
+	export class InstalledLivery {
+	    name: string;
+	    path: string;
+	    icon: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new InstalledLivery(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = source["name"];
+	        this.path = source["path"];
+	        this.icon = source["icon"];
+	    }
+	}
 	export class ZiboBackup {
 	    backupPath: string;
 	    version: string;
