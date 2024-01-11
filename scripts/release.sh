@@ -6,11 +6,12 @@ if [ -z "$1" ]
     exit 1
 fi
 
+
+version=$(npm version $@ --no-git-tag-version) # Adjust as needed
+sed -i '' "s/\"version\": \".*\"/\"version\": \"$version\"/" wails.json
 rm -rf build/bin
 wails build --platform darwin/universal
-
 npx --yes create-dmg build/bin/yazu.app build/bin --overwrite || true
-version=$(npm version $@ --no-git-tag-version) # Adjust as needed
 rm -rf build/bin/yazu_*.dmg
 mv "build/bin/yazu 1.0.0.dmg" "build/bin/yazu_${version}.dmg"
 

@@ -9,5 +9,9 @@
   "author": {
     "name": "Di Zou",
     "email": "di.zou1214@gmail.com"
+  },
+  "info": {
+    "version": "0.0.1-alpha.27",
+    "description": "Yet Another Zibo Updater"
   }
 }
