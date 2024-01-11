@@ -1,3 +1,12 @@
+## [0.0.1-alpha.27](https://github.com/xairline/yazu/compare/v0.0.1-alpha.26...v0.0.1-alpha.27) (2024-01-11)
+
+
+### Bug Fixes
+
+* wails app version is not updated ([88b4fff](https://github.com/xairline/yazu/commit/88b4fff39dbb6567f54dd4364903d3a8233f3979))
+
+
+
 ## [0.0.1-alpha.26](https://github.com/xairline/yazu/compare/v0.0.1-alpha.25...v0.0.1-alpha.26) (2024-01-11)
 
 
