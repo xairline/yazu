@@ -1,3 +1,12 @@
+## [0.0.1-alpha.26](https://github.com/xairline/yazu/compare/v0.0.1-alpha.25...v0.0.1-alpha.26) (2024-01-11)
+
+
+### Features
+
+* special debug version with detailed logging on file permission ([2c4aac0](https://github.com/xairline/yazu/commit/2c4aac0bc12722c7b1d4629ec0022a38541bc98c))
+
+
+
 ## [0.0.1-alpha.25](https://github.com/xairline/yazu/compare/v0.0.1-alpha.24...v0.0.1-alpha.25) (2024-01-10)
 
 
