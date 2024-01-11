@@ -1,3 +1,12 @@
+## [0.0.1-alpha.30](https://github.com/xairline/yazu/compare/v0.0.1-alpha.29...v0.0.1-alpha.30) (2024-01-11)
+
+
+### Features
+
+* list liveries from org forums: Home->Downloads->Aircraft Skin->Liveries ([24d0292](https://github.com/xairline/yazu/commit/24d029203cead4c682252f8b1fdd6ff7b094853b))
+
+
+
 ## [0.0.1-alpha.29](https://github.com/xairline/yazu/compare/v0.0.1-alpha.28...v0.0.1-alpha.29) (2024-01-11)
 
 
