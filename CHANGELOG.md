@@ -1,3 +1,12 @@
+## [0.0.1-beta.1](https://github.com/xairline/yazu/compare/v0.0.1-beta.0...v0.0.1-beta.1) (2024-01-11)
+
+
+### Features
+
+* merge commits ([daffa74](https://github.com/xairline/yazu/commit/daffa7407788a73277212189fdbda031b8b497cd))
+
+
+
 ## [0.0.1-beta.0](https://github.com/xairline/yazu/compare/v0.0.1-alpha.32...v0.0.1-beta.0) (2024-01-11)
 
 
