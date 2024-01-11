@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"github.com/go-rod/rod"
 	"github.com/google/uuid"
 	"github.com/pkg/xattr"
 	"github.com/saracen/fastzip"
@@ -389,11 +390,44 @@ func (z *ZiboInstaller) GetLiveries(installationDetails utils.ZiboInstallation) 
 
 func (z *ZiboInstaller) GetAvailableLiveries() []AvailableLivery {
 	var res []AvailableLivery
-	//browser := rod.New().MustConnect()
-	//page := browser.MustPage("https://forums.x-plane.org/index.php?/files/category/209-zibo-737/")
-	//tmp := page.MustWaitLoad().MustEval("()=>Array.from(document.querySelectorAll(\"li.ipsDataItem.ipsDataItem_unread\")).map(li => li.textContent)")
-	//log.Printf("%v", tmp)
+	browser := rod.New().MustConnect()
+	mainPage := browser.MustPage("https://forums.x-plane.org/index.php?/files/category/209-zibo-737/").MustWaitLoad()
+	//page.MustEval(`window.scrollTo(0, document.body.scrollHeight);`)
+	numOfPages, err := GetNumberOfPages(mainPage)
+	if err != nil || numOfPages == 0 {
+		z.log.Errorf("Error getting number of pages: %s", err)
+		return res
+
+	}
+	z.log.Infof("Found %d pages", numOfPages)
+	for i := 1; i <= numOfPages; i++ {
+		page := browser.MustPage(fmt.Sprintf("https://forums.x-plane.org/index.php?/files/category/209-zibo-737/&page=%d", i)).MustWaitLoad()
+		listOfLiveryElements := page.MustElementsX("//li[contains(@class, 'ipsDataItem')]")
+		z.log.Infof("Found %d liveries", len(listOfLiveryElements))
+		for _, liveryElement := range listOfLiveryElements {
+			liveryUrl := liveryElement.MustElementX(".//h4/span[contains(@class, 'ipsType_break')]/a")
+			name, err := liveryUrl.Text()
+			if err != nil {
+				z.log.Errorf("Error getting livery name: %s", err)
+				continue
+			}
+			url := *liveryUrl.MustAttribute("href")
+			liveryIcon := liveryElement.MustElementX(".//img")
+			icon, err := GetIconBase64(liveryIcon)
+			if err != nil {
+				z.log.Errorf("Error getting livery icon: %s", err)
+			}
+			res = append(res, AvailableLivery{
+				Name:   name,
+				Url:    url,
+				Source: "org",
+				Icon:   icon,
+			})
+		}
+	}
+
 	return res
+	////*[@id="elTable_eae59de432760c28c5da8b6d3ee20a2f"]/li[1]/div[2]/h4
 }
 
 // copyFile copies a single file from src to dst, preserving file permissions.

@@ -6,6 +6,7 @@ toolchain go1.21.0
 
 require (
 	github.com/anacrolix/torrent v1.53.2
+	github.com/go-rod/rod v0.114.5
 	github.com/google/uuid v1.3.0
 	github.com/pkg/xattr v0.4.9
 	github.com/saracen/fastzip v0.1.11
@@ -95,6 +96,11 @@ require (
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/wailsapp/go-webview2 v1.0.10 // indirect
 	github.com/wailsapp/mimetype v1.4.1 // indirect
+	github.com/ysmood/fetchup v0.2.3 // indirect
+	github.com/ysmood/goob v0.4.0 // indirect
+	github.com/ysmood/got v0.34.1 // indirect
+	github.com/ysmood/gson v0.7.3 // indirect
+	github.com/ysmood/leakless v0.8.0 // indirect
 	go.etcd.io/bbolt v1.3.6 // indirect
 	go.opentelemetry.io/otel v1.8.0 // indirect
 	go.opentelemetry.io/otel/trace v1.8.0 // indirect

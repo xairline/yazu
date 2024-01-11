@@ -13,6 +13,7 @@ import {
     UpdateZibo
 } from "../../wailsjs/go/main/App";
 import {installer, utils} from "../../wailsjs/go/models";
+import {BrowserOpenURL, LogInfo} from "../../wailsjs/runtime";
 import ZiboInstallation = utils.ZiboInstallation;
 import InstalledLivery = installer.InstalledLivery;
 import AvailableLivery = installer.AvailableLivery;
@@ -29,14 +30,11 @@ function Zibo() {
         const fetchDetails = async () => {
             const details = await FindZiboInstallationDetails();
             const liveries = await GetLiveries(details);
-            const availableLiveries = await GetAvailableLiveries();
-            setAvailableLiveries(availableLiveries)
             setInstalledLiveries(liveries);
             setZiboDetails(details)
         };
         // Call it once immediately
         fetchDetails();
-
         // Set an interval to call it every 30 seconds
         const interval = setInterval(fetchDetails, 30000);
 
@@ -44,6 +42,13 @@ function Zibo() {
         return () => clearInterval(interval);
 
     }, []);
+    useEffect(() => {
+        (async () => {
+            const availableLiveries = await GetAvailableLiveries();
+            LogInfo("availableLiveries:" + availableLiveries.length)
+            setAvailableLiveries(availableLiveries)
+        })()
+    }, [])
 
     const handleBackup = async () => {
         setRunning(true);
@@ -177,7 +182,7 @@ function Zibo() {
                                 label: "Installed Liveries",
                                 key: "installedLiveries",
                                 children: <Table
-                                    title={() => "Liveries"}
+                                    // title={() => "Liveries"}
                                     dataSource={installedLiveries}
                                     style={{overflow: "scroll"}}
                                     columns={[
@@ -209,6 +214,7 @@ function Zibo() {
                                     title={() => "Liveries"}
                                     dataSource={availableLiveries}
                                     style={{overflow: "scroll"}}
+                                    pagination={{pageSize: 25}}
                                     columns={[
                                         {
                                             title: 'Icon',
@@ -216,18 +222,22 @@ function Zibo() {
                                             key: 'icon',
                                             render: (icon: string) => <img src={`data:image/png;base64,${icon}`}
                                                                            alt={"icon"}
-                                                                           width={160} height={90}/>
+                                                                           width={320} height={200}/>
                                         },
                                         {
                                             title: 'Name',
                                             dataIndex: 'name',
                                             key: 'name',
                                         },
-                                        // {
-                                        //     title: 'Installed Path',
-                                        //     dataIndex: 'path',
-                                        //     key: 'path',
-                                        // },
+                                        {
+                                            title: '',
+                                            dataIndex: 'url',
+                                            key: 'url',
+                                            render: (url: string) => <Button
+                                                onClick={() => {
+                                                    BrowserOpenURL(url)
+                                                }} title={'DOWNLOAD'}>DOWNLOAD</Button>
+                                        },
                                     ]}
                                 />,
                             },

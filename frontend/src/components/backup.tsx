@@ -94,14 +94,14 @@ function Backup() {
                     ]}
                 />
             </Card>
-            <Divider/>
-            <Card style={{
-                minHeight: "100%",
-            }}
-            >
-                <Skeleton/>
-                {JSON.stringify(cachedFiles)}
-            </Card>
+            {/*<Divider/>*/}
+            {/*<Card style={{*/}
+            {/*    minHeight: "100%",*/}
+            {/*}}*/}
+            {/*>*/}
+            {/*    <Skeleton/>*/}
+            {/*    {JSON.stringify(cachedFiles)}*/}
+            {/*</Card>*/}
         </Spin>
     )
 }

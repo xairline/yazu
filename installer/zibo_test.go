@@ -36,6 +36,18 @@ func TestNewZibo(t *testing.T) {
 	assert.NotNil(t, config, "ZiboInstaller should not be nil")
 }
 
+func TestOrgZiboLiveries(t *testing.T) {
+	config, tempDir := setup(t)
+	defer func() {
+		_ = os.RemoveAll(tempDir) // Clean up
+		_, err := os.Stat(tempDir)
+		assert.True(t, os.IsNotExist(err))
+	}()
+	res := config.GetAvailableLiveries()
+	// Assert: Check if the configuration was created correctly
+	assert.NotNil(t, res)
+}
+
 //
 //// TestInstall
 //func TestInstall(t *testing.T) {

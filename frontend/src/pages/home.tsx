@@ -41,14 +41,14 @@ function Home() {
                         children: <Zibo/>,
                     },
                     {
-                        label: "Configuration",
-                        key: "configuration",
-                        children: <Config/>,
-                    },
-                    {
                         label: "Backups",
                         key: "backups",
                         children: <Backup/>,
+                    },
+                    {
+                        label: "Configuration",
+                        key: "configuration",
+                        children: <Config/>,
                     },
                 ]
             }
