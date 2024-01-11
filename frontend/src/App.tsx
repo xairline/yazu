@@ -70,7 +70,6 @@ function App() {
 
                             </Image>
                         </Link>
-                        TEST
                     </Row>
                 </Col>
             </Row>

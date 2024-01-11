@@ -425,7 +425,7 @@ func copyFile(src, dst string) error {
 	}
 	err = xattr.Remove(dst, "com.apple.quarantine")
 	if err != nil {
-		logrus.New().Errorf("Error removing quarantine: %s", err)
+		logrus.New().Warningf("failed to removing quarantine: %s", err)
 	}
 	return os.Chmod(dst, 0700)
 }

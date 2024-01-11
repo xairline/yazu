@@ -46,20 +46,24 @@ func (m *TorrentManager) AddTorrent(torrentURL string, subPath string) error {
 	// Read the torrent file
 	torrentData, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
+		m.log.Error(err)
 		return err
 	}
 
 	// Write to a temporary file
 	tmpFile, err := ioutil.TempFile("", "*.torrent")
 	if err != nil {
+		m.log.Error(err)
 		return err
 	}
 	defer os.Remove(tmpFile.Name()) // Clean up
 
 	if _, err = tmpFile.Write(torrentData); err != nil {
+		m.log.Error(err)
 		return err
 	}
 	if err = tmpFile.Close(); err != nil {
+		m.log.Error(err)
 		return err
 	}
 
@@ -68,11 +72,13 @@ func (m *TorrentManager) AddTorrent(torrentURL string, subPath string) error {
 
 	client, err := torrent.NewClient(cfg)
 	if err != nil {
+		m.log.Error(err)
 		return err
 	}
 
 	tor, err := client.AddTorrentFromFile(tmpFile.Name())
 	if err != nil {
+		m.log.Error(err)
 		return err
 	}
 	tor.DisallowDataUpload()
