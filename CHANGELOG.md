@@ -1,3 +1,12 @@
+## [0.0.1-alpha.28](https://github.com/xairline/yazu/compare/v0.0.1-alpha.27...v0.0.1-alpha.28) (2024-01-11)
+
+
+### Bug Fixes
+
+* path should be treated as if they are case sensitive ([b8e8ac3](https://github.com/xairline/yazu/commit/b8e8ac3c42216c4c5cf0833fa16c8554c586dadf))
+
+
+
 ## [0.0.1-alpha.27](https://github.com/xairline/yazu/compare/v0.0.1-alpha.26...v0.0.1-alpha.27) (2024-01-11)
 
 
