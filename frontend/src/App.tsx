@@ -35,7 +35,7 @@ function App() {
     useEffect(() => {
         (async () => {
             const config = await GetConfig();
-            const isPathValid = await CheckXPlanePath(config.XPlanePath);
+            const isPathValid = await CheckXPlanePath(config.XPlanePath, []);
             setPathValid(isPathValid);
             if (!isPathValid) {
                 console.log(JSON.stringify(config));

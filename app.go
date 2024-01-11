@@ -27,9 +27,9 @@ type DownloadInfo struct {
 func NewApp() *App {
 	log := logrus.New()
 	zibo := installer.NewZibo(utils.RealHomeDirGetter{}, true, log)
-
+	homeDir, _ := utils.RealHomeDirGetter{}.UserHomeDir()
 	file, err := os.OpenFile(
-		filepath.Join(zibo.Config.YazuCachePath, "..", "yazu.log"),
+		filepath.Join(homeDir, ".yazu", "yazu.log"),
 		os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
 		log.Error("Failed to log to file, using default stderr")
@@ -50,11 +50,11 @@ func (a *App) startup(ctx context.Context) {
 
 func (a *App) IsXPlanePathConfigured() bool {
 	config := utils.GetConfig(utils.RealHomeDirGetter{}, true, a.Log)
-	return config.CheckXPlanePath(a.zibo.Config.XPlanePath)
+	return config.CheckXPlanePath(a.zibo.Config.XPlanePath, []string{})
 }
-func (a *App) CheckXPlanePath(dirPath string) bool {
+func (a *App) CheckXPlanePath(dirPath string, cachePath []string) bool {
 	config := utils.GetConfig(utils.RealHomeDirGetter{}, true, a.Log)
-	return config.CheckXPlanePath(dirPath)
+	return config.CheckXPlanePath(dirPath, cachePath)
 }
 func (a *App) GetConfig() utils.Config {
 	return *a.zibo.Config

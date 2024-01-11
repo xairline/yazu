@@ -95,7 +95,7 @@ func newConfig(homeDirGetter HomeDirGetter, log *logrus.Logger) *Config {
 	return config
 }
 
-func (c *Config) CheckXPlanePath(dirPath string) bool {
+func (c *Config) CheckXPlanePath(dirPath string, cachePath []string) bool {
 	// check if path contains a file that contains name of X-Plane 12 Installer
 	found := false
 	_ = filepath.Walk(dirPath, func(path string, info os.FileInfo, err error) error {
@@ -111,6 +111,9 @@ func (c *Config) CheckXPlanePath(dirPath string) bool {
 			if strings.Contains(path, "Log.txt") {
 				// store path in home directory
 				c.XPlanePath = filepath.Dir(path)
+				if len(cachePath) == 1 {
+					c.YazuCachePath = cachePath[0]
+				}
 				err = c.Save()
 				if err != nil {
 					c.log.Errorf("Error saving config: %v", err)

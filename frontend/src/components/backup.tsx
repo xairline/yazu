@@ -38,7 +38,7 @@ function Backup() {
             }}
             >
                 <Table
-                    dataSource={backups.map((backup: ZiboBackup) => {
+                    dataSource={backups?.map((backup: ZiboBackup) => {
                         const date = backup.date
                         let date1 = date.split("_")[0]
                         let date2 = date.split("_")[1]

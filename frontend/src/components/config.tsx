@@ -14,7 +14,7 @@ function Config() {
         (async () => {
             const config = await GetConfig();
             setConfig(config);
-            const isPathValid = await CheckXPlanePath(config.XPlanePath);
+            const isPathValid = await CheckXPlanePath(config.XPlanePath, []);
             setXplanePath(config.XPlanePath);
             setPathValid(isPathValid);
         })()
@@ -22,12 +22,19 @@ function Config() {
 
     const handleFolderInputClick = async () => {
         const path = await OpenDirDialog()
-        const isPathValid = await CheckXPlanePath(path);
+        const isPathValid = await CheckXPlanePath(path, []);
         if (isPathValid) {
             setXplanePath(path);
         }
         setPathValid(isPathValid);
 
+    };
+
+    const handleCacheInputClick = async () => {
+        const cachePath = await OpenDirDialog()
+        await CheckXPlanePath(xplanePath, [cachePath]);
+        const config = await GetConfig();
+        setConfig(config);
     };
 
     return (
@@ -68,7 +75,7 @@ function Config() {
                 <Col flex={"auto"}>YAZU Cache:</Col>
                 <Col flex={"auto"}>
                     <Input value={config.YazuCachePath}
-                           disabled={true}
+                           onClick={handleCacheInputClick}
                     >
                     </Input>
                 </Col>

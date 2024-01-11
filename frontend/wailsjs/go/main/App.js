@@ -6,8 +6,8 @@ export function BackupZiboInstallation(arg1) {
   return window['go']['main']['App']['BackupZiboInstallation'](arg1);
 }
 
-export function CheckXPlanePath(arg1) {
-  return window['go']['main']['App']['CheckXPlanePath'](arg1);
+export function CheckXPlanePath(arg1, arg2) {
+  return window['go']['main']['App']['CheckXPlanePath'](arg1, arg2);
 }
 
 export function DownloadZibo(arg1) {

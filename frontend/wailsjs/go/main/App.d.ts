@@ -6,7 +6,7 @@ import {installer} from '../models';
 
 export function BackupZiboInstallation(arg1:utils.ZiboInstallation):Promise<boolean>;
 
-export function CheckXPlanePath(arg1:string):Promise<boolean>;
+export function CheckXPlanePath(arg1:string,arg2:Array<string>):Promise<boolean>;
 
 export function DownloadZibo(arg1:boolean):Promise<main.DownloadInfo>;
 

@@ -188,6 +188,7 @@ func (z *ZiboInstaller) GetBackups() []ZiboBackup {
 	z.log.Infof("Getting backups from %s", backupDir)
 	_ = filepath.Walk(backupDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
+			z.log.Errorf("Error walking path: %s", err)
 			return err
 		}
 
