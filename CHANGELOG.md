@@ -1,3 +1,12 @@
+## [0.0.1-alpha.29](https://github.com/xairline/yazu/compare/v0.0.1-alpha.28...v0.0.1-alpha.29) (2024-01-11)
+
+
+### Bug Fixes
+
+* add more logging, remove the test tag on UI ([77e1414](https://github.com/xairline/yazu/commit/77e1414a5275b7d32c1bcf230e32c1409816ae8a))
+
+
+
 ## [0.0.1-alpha.28](https://github.com/xairline/yazu/compare/v0.0.1-alpha.27...v0.0.1-alpha.28) (2024-01-11)
 
 
