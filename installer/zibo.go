@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"github.com/google/uuid"
+	"github.com/pkg/xattr"
 	"github.com/saracen/fastzip"
 	"github.com/sirupsen/logrus"
 	"github/xairline/yazu/utils"
@@ -160,7 +161,10 @@ func (z *ZiboInstaller) unzip(src, dst string, fresh bool) {
 			}
 		}
 	}
-	_ = ditto(tmpUnzipDir, dst)
+	err = ditto(tmpUnzipDir, dst)
+	if err != nil {
+		z.log.Errorf("Error copying file contents: %s", err)
+	}
 	_ = os.RemoveAll(tmpUnzipDir)
 	// move files from tmp directory to destination
 	if runtimeOS := runtime.GOOS; runtimeOS == "darwin" {
@@ -321,6 +325,7 @@ func (z *ZiboInstaller) FindInstallationDetails() utils.ZiboInstallation {
 	}
 	_ = filepath.Walk(filepath.Join(z.Config.XPlanePath, "aircraft"), func(path string, info os.FileInfo, err error) error {
 		if err != nil {
+			z.log.Errorf("Error walking path: %s", err)
 			return err // prevent panic by handling failure accessing a path
 		}
 		if info.IsDir() && info.Name() == "zibomod" {
@@ -418,7 +423,10 @@ func copyFile(src, dst string) error {
 	if err != nil {
 		return err
 	}
-
+	err = xattr.Remove(dst, "com.apple.quarantine")
+	if err != nil {
+		logrus.New().Errorf("Error removing quarantine: %s", err)
+	}
 	return os.Chmod(dst, 0700)
 }
 

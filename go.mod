@@ -7,6 +7,7 @@ toolchain go1.21.0
 require (
 	github.com/anacrolix/torrent v1.53.2
 	github.com/google/uuid v1.3.0
+	github.com/pkg/xattr v0.4.9
 	github.com/saracen/fastzip v0.1.11
 	github.com/sirupsen/logrus v1.4.2
 	github.com/stretchr/testify v1.8.3
