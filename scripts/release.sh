@@ -10,17 +10,17 @@ fi
 version=$(npm version $@ --no-git-tag-version) # Adjust as needed
 sed -i '' "s/\"version\": \".*\"/\"version\": \"$version\"/" wails.json
 rm -rf build/bin
-wails build --platform darwin/universal
+wails build --platform windows/amd64,darwin/universal,linux/amd64
 npx --yes create-dmg build/bin/yazu.app build/bin --overwrite || true
-rm -rf build/bin/yazu_*.dmg
 mv "build/bin/yazu 1.0.0.dmg" "build/bin/yazu_${version}.dmg"
+mv "build/bin/yazu-amd64.exe" "build/bin/yazu_${version}.exe"
 
 conventional-changelog -p angular -i CHANGELOG.md -s
 
 git commit -am "Update changelog"
 git tag ${version}
 npx --yes gh-release \
-  --assets build/bin/yazu_${version}.dmg \
+  --assets build/bin/yazu_${version}.dmg,build/bin/yazu_${version}.exe \
   -t ${version} \
   --prerelease \
   -y -c main \
