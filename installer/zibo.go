@@ -323,7 +323,7 @@ func (z *ZiboInstaller) FindInstallationDetails() utils.ZiboInstallation {
 		RemoteVersion: z.rss.GetLatestVersion(),
 		BackupVersion: z.GetLastBackupVersion(),
 	}
-	_ = filepath.Walk(filepath.Join(z.Config.XPlanePath, "aircraft"), func(path string, info os.FileInfo, err error) error {
+	_ = filepath.Walk(filepath.Join(z.Config.XPlanePath, "Aircraft"), func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			z.log.Errorf("Error walking path: %s", err)
 			return err // prevent panic by handling failure accessing a path
