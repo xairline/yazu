@@ -22,10 +22,11 @@ import (
 )
 
 type ZiboInstaller struct {
-	TorrentManager *utils.TorrentManager
-	rss            *utils.Rss
-	Config         *utils.Config
-	log            *logrus.Logger
+	TorrentManager  *utils.TorrentManager
+	rss             *utils.Rss
+	Config          *utils.Config
+	log             *logrus.Logger
+	AvailableLivery []AvailableLivery
 }
 
 type ZiboBackup struct {
@@ -222,6 +223,7 @@ func (z *ZiboInstaller) GetBackups() []ZiboBackup {
 func (z *ZiboInstaller) GetLastBackupVersion() string {
 	backupVersion := "N/A"
 	backupDir := filepath.Join(z.Config.YazuCachePath, "backup")
+
 	_ = filepath.Walk(backupDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -234,9 +236,21 @@ func (z *ZiboInstaller) GetLastBackupVersion() string {
 		if !info.IsDir() {
 			if strings.LastIndex(path, ".zip") != -1 {
 				backupPath := path
-				backupVersion = strings.ReplaceAll(backupPath, z.Config.YazuCachePath, "")
-				backupVersion = strings.ReplaceAll(backupVersion, ".zip", "")
-				backupVersion = strings.ReplaceAll(backupVersion, "/backup/", "")
+				tmpBackupVersion := strings.ReplaceAll(backupPath, z.Config.YazuCachePath, "")
+				tmpBackupVersion = strings.ReplaceAll(tmpBackupVersion, ".zip", "")
+				tmpBackupVersion = strings.ReplaceAll(tmpBackupVersion, "/backup/", "")
+				timestamp, err := time.Parse("2006-01-02_15-04-05", strings.SplitN(tmpBackupVersion, "-", 2)[1])
+				if err != nil {
+					z.log.Errorf("Error parsing timestamp: %s", err)
+				}
+				if backupVersion == "N/A" {
+					backupVersion = tmpBackupVersion
+				} else {
+					curLatestTimestamp, _ := time.Parse("2006-01-02_15-04-05", strings.SplitN(backupVersion, "-", 2)[1])
+					if timestamp.After(curLatestTimestamp) {
+						backupVersion = tmpBackupVersion
+					}
+				}
 			}
 		}
 		return nil
@@ -384,6 +398,9 @@ func (z *ZiboInstaller) GetLiveries(installationDetails utils.ZiboInstallation) 
 }
 
 func (z *ZiboInstaller) GetAvailableLiveries() []AvailableLivery {
+	if len(z.AvailableLivery) != 0 {
+		return z.AvailableLivery
+	}
 	var res []AvailableLivery
 	browser := rod.New().MustConnect()
 	mainPage := browser.MustPage("https://forums.x-plane.org/index.php?/files/category/209-zibo-737/").MustWaitLoad()
@@ -420,7 +437,7 @@ func (z *ZiboInstaller) GetAvailableLiveries() []AvailableLivery {
 			})
 		}
 	}
-
+	z.AvailableLivery = res
 	return res
 	////*[@id="elTable_eae59de432760c28c5da8b6d3ee20a2f"]/li[1]/div[2]/h4
 }

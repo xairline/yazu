@@ -46,7 +46,7 @@ function Backup() {
                         // // return date1 + "T" + date2 + "Z"
                         // return new Date(date1 + "T" + date2 + "Z").toLocaleString()
                         return {
-                            key: backup.version,
+                            key: backup.backupPath,
                             version: backup.version,
                             date: new Date(date1 + "T" + date2 + "Z"),
                             size: (backup.size / 1024 / 1024).toFixed(2) + "MB",
@@ -57,10 +57,23 @@ function Backup() {
                         {
                             title: 'Version',
                             dataIndex: 'version',
-                            key: 'version',
+                            key: 'key',
                             sorter: (a: any, b: any) => {
-                                return parseInt(a.version.split(".")[2]) - parseInt(b.version.split(".")[2])
+                                const parseSemver = (version: string) => {
+                                    return version.split('.').map((num: string) => parseInt(num, 10));
+                                };
+                                const [majorA, minorA, patchA] = parseSemver(a.version);
+                                const [majorB, minorB, patchB] = parseSemver(b.version);
+
+                                if (majorA !== majorB) {
+                                    return majorA - majorB;
+                                }
+                                if (minorA !== minorB) {
+                                    return minorA - minorB;
+                                }
+                                return patchA - patchB;
                             },
+                            defaultSortOrder: 'descend',
                         },
                         {
                             title: 'Date',
@@ -69,7 +82,15 @@ function Backup() {
                             render: (date: string) => {
                                 return date.toLocaleString()
                             },
-                            sorter: (a: any, b: any) => a.date - b.date,
+                            sorter: (a: any, b: any) => {
+                                // Convert date strings to Date objects
+                                const dateA = new Date(a.date);
+                                const dateB = new Date(b.date);
+
+                                // Compare the dates
+                                // @ts-ignore
+                                return dateA - dateB;
+                            },
                         },
                         {
                             title: 'Size',
