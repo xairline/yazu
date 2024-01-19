@@ -1,3 +1,12 @@
+## [0.1.1-beta.1](https://github.com/xairline/yazu/compare/v0.1.1-beta.0...v0.1.1-beta.1) (2024-01-19)
+
+
+### Bug Fixes
+
+* sorting on SemVer not string ([85f6c3f](https://github.com/xairline/yazu/commit/85f6c3f05622b7fc6f0a3209d0defc954bc56176))
+
+
+
 ## [0.1.1-beta.0](https://github.com/xairline/yazu/compare/v0.1.0...v0.1.1-beta.0) (2024-01-19)
 
 
