@@ -5,6 +5,9 @@
 
 * allow manage of multiple zibo ([f0cd03c](https://github.com/xairline/yazu/commit/f0cd03c3fbc47a843d2141ec0120f33ddfa8078b))
 
+### Bug Fixes
+
+* fix version sort
 
 
 ## [0.0.1-beta.1](https://github.com/xairline/yazu/compare/v0.0.1-beta.0...v0.0.1-beta.1) (2024-01-11)
