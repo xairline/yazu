@@ -1,3 +1,12 @@
+# [0.1.0](https://github.com/xairline/yazu/compare/v0.0.1-beta.1...v0.1.0) (2024-01-19)
+
+
+### Features
+
+* allow manage of multiple zibo ([f0cd03c](https://github.com/xairline/yazu/commit/f0cd03c3fbc47a843d2141ec0120f33ddfa8078b))
+
+
+
 ## [0.0.1-beta.1](https://github.com/xairline/yazu/compare/v0.0.1-beta.0...v0.0.1-beta.1) (2024-01-11)
 
 
