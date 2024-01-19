@@ -64,7 +64,7 @@ func (a *App) OpenDirDialog() string {
 	return res
 }
 
-func (a *App) FindZiboInstallationDetails() utils.ZiboInstallation {
+func (a *App) FindZiboInstallationDetails() []utils.ZiboInstallation {
 	// find the zibo folder in the X-Plane directory
 	return a.zibo.FindInstallationDetails()
 }

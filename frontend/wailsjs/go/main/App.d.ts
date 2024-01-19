@@ -10,7 +10,7 @@ export function CheckXPlanePath(arg1:string,arg2:Array<string>):Promise<boolean>
 
 export function DownloadZibo(arg1:boolean):Promise<main.DownloadInfo>;
 
-export function FindZiboInstallationDetails():Promise<utils.ZiboInstallation>;
+export function FindZiboInstallationDetails():Promise<Array<utils.ZiboInstallation>>;
 
 export function GetAvailableLiveries():Promise<Array<installer.AvailableLivery>>;
 

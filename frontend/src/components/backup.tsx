@@ -5,7 +5,7 @@ import {
     GetCachedFiles,
     RestoreZiboInstallation
 } from "../../wailsjs/go/main/App";
-import {Button, Card, Divider, Skeleton, Spin, Table} from "antd";
+import {Card, Dropdown, Spin, Table} from "antd";
 import {installer, utils} from "../../wailsjs/go/models";
 import ZiboBackup = installer.ZiboBackup;
 import ZiboInstallation = utils.ZiboInstallation;
@@ -16,7 +16,7 @@ function Backup() {
     const [running, setRunning] = useState(false);
     const [cachedFiles, setCachedFiles] = useState({});
     const [progressDetails, setProgressDetails] = useState("")
-    const [ziboDetails, setZiboDetails] = useState({} as ZiboInstallation);
+    const [ziboDetails, setZiboDetails] = useState({} as ZiboInstallation[]);
     useEffect(() => {
         (async () => {
             const backups = await GetBackups();
@@ -58,9 +58,9 @@ function Backup() {
                             title: 'Version',
                             dataIndex: 'version',
                             key: 'version',
-                            // sorter: (a: any, b: any) => {
-                            //
-                            // },
+                            sorter: (a: any, b: any) => {
+                                return parseInt(a.version.split(".")[2]) - parseInt(b.version.split(".")[2])
+                            },
                         },
                         {
                             title: 'Date',
@@ -81,14 +81,42 @@ function Backup() {
                             dataIndex: 'action',
                             key: 'action',
                             render: (text: string, record: ZiboBackup) => {
-                                return <Button danger={true} type={"primary"} onClick={
-                                    async () => {
-                                        setRunning(true)
-                                        setProgressDetails("Restoring ...")
-                                        await RestoreZiboInstallation(ziboDetails, record.backupPath)
-                                        setRunning(false)
-                                    }
-                                }>Restore</Button>
+                                // return <Button danger={true} type={"primary"} onClick={
+                                //     async () => {
+                                //         setRunning(true)
+                                //         setProgressDetails("Restoring ...")
+                                //         await RestoreZiboInstallation(ziboDetails[0], record.backupPath)
+                                //         setRunning(false)
+                                //     }
+                                // }>Restore</Button>
+                                return <Dropdown.Button
+                                    danger={true}
+                                    type={"primary"}
+                                    menu={{
+                                        items: ziboDetails.map((ziboDetail: ZiboInstallation) => {
+                                            return {
+                                                label: ziboDetail.path.split("/Aircraft/")[1].split("/plugins/")[0],
+                                                key: ziboDetail.path,
+                                            }
+                                        }),
+                                        onClick: async (e) => {
+                                            setRunning(true)
+                                            setProgressDetails(`Restoring ...${e.key}`)
+                                            const installationDetails = ziboDetails.find(
+                                                (ziboDetail: ZiboInstallation) => {
+                                                    return ziboDetail.path === e.key
+                                                }
+                                            )
+                                            if (!installationDetails) {
+                                                return
+                                            }
+                                            await RestoreZiboInstallation(installationDetails, record.backupPath)
+                                            setRunning(false)
+                                        }
+                                    }}
+                                >
+                                    Restore
+                                </Dropdown.Button>
                             }
                         },
                     ]}

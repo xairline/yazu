@@ -14,24 +14,24 @@ import {
 } from "../../wailsjs/go/main/App";
 import {installer, utils} from "../../wailsjs/go/models";
 import {BrowserOpenURL, LogInfo} from "../../wailsjs/runtime";
-import ZiboInstallation = utils.ZiboInstallation;
 import InstalledLivery = installer.InstalledLivery;
 import AvailableLivery = installer.AvailableLivery;
 
+interface ZiboProps {
+    installationDetails: utils.ZiboInstallation
+}
 
-function Zibo() {
+function Zibo(props: ZiboProps) {
     // const screens = useBreakpoint();
     const [running, setRunning] = useState(false);
-    const [ziboDetails, setZiboDetails] = useState({} as ZiboInstallation);
     const [progressDetails, setProgressDetails] = useState("")
     const [installedLiveries, setInstalledLiveries] = useState([] as InstalledLivery[]);
     const [availableLiveries, setAvailableLiveries] = useState([] as AvailableLivery[]);
     useEffect(() => {
         const fetchDetails = async () => {
             const details = await FindZiboInstallationDetails();
-            const liveries = await GetLiveries(details);
+            const liveries = await GetLiveries(props.installationDetails);
             setInstalledLiveries(liveries);
-            setZiboDetails(details)
         };
         // Call it once immediately
         fetchDetails();
@@ -53,18 +53,16 @@ function Zibo() {
     const handleBackup = async () => {
         setRunning(true);
         setProgressDetails("Backing up ...")
-        await BackupZiboInstallation(ziboDetails);
+        await BackupZiboInstallation(props.installationDetails);
         const details = await FindZiboInstallationDetails();
-        setZiboDetails(details)
         setRunning(false);
     }
 
     const handleRestore = async () => {
         setRunning(true);
         setProgressDetails("Restoring ...")
-        await RestoreZiboInstallation(ziboDetails, "");
+        await RestoreZiboInstallation(props.installationDetails, "");
         const details = await FindZiboInstallationDetails();
-        setZiboDetails(details)
         setRunning(false);
     }
     const handleInstall = async () => {
@@ -78,9 +76,8 @@ function Zibo() {
             }
         }
         setProgressDetails("Installing ...")
-        await InstallZibo(ziboDetails, downloadInfo.path);
+        await InstallZibo(props.installationDetails, downloadInfo.path);
         const details = await FindZiboInstallationDetails();
-        setZiboDetails(details)
         setRunning(false);
     }
 
@@ -95,9 +92,8 @@ function Zibo() {
             }
         }
         setProgressDetails("Updating ...")
-        await UpdateZibo(ziboDetails, downloadInfo.path);
+        await UpdateZibo(props.installationDetails, downloadInfo.path);
         const details = await FindZiboInstallationDetails();
-        setZiboDetails(details)
         setRunning(false);
     }
 
@@ -120,27 +116,27 @@ function Zibo() {
                     }}>
                         <Button
                             type={"primary"}
-                            danger={ziboDetails.version !== ""}
+                            danger={props.installationDetails.version !== ""}
                             style={{marginRight: "12px"}}
-                            onClick={handleInstall}>{ziboDetails.version === "" ? "Install" : "Reinstall"}</Button>
+                            onClick={handleInstall}>{props.installationDetails.version === "" ? "Install" : "Reinstall"}</Button>
                         <Button
                             type={"primary"}
                             style={{marginRight: "12px"}}
                             disabled={
-                                ziboDetails.version === ziboDetails.remoteVersion ||
-                                ziboDetails.version === ""
+                                props.installationDetails.version === props.installationDetails.remoteVersion ||
+                                props.installationDetails.version === ""
                             }
                             onClick={handleUpdate}>Update</Button>
                         <Button
                             type={"primary"}
                             style={{marginRight: "12px"}}
-                            disabled={ziboDetails.version === ""}
+                            disabled={props.installationDetails.version === ""}
                             onClick={handleBackup}>Backup</Button>
                         <Button
                             type={"primary"}
                             danger={true}
                             style={{marginRight: "12px"}}
-                            disabled={ziboDetails.backupVersion === "N/A"}
+                            disabled={props.installationDetails.backupVersion === "N/A"}
                             onClick={handleRestore}>Restore</Button>
                     </Col>
                     <Col span={24}>
@@ -153,23 +149,23 @@ function Zibo() {
                                 {
                                     key: '1',
                                     label: 'Installed Version',
-                                    children: `${ziboDetails.version}`,
+                                    children: `${props.installationDetails.version}`,
 
                                 },
                                 {
                                     key: '2',
                                     label: 'Current Version',
-                                    children: `${ziboDetails.remoteVersion}`,
+                                    children: `${props.installationDetails.remoteVersion}`,
                                 },
                                 {
                                     key: '3',
                                     label: 'Backup Version',
-                                    children: `${ziboDetails.backupVersion}`,
+                                    children: `${props.installationDetails.backupVersion}`,
                                 },
                                 {
                                     key: '10',
                                     label: 'Installed Path',
-                                    children: `${ziboDetails.path}`,
+                                    children: `${props.installationDetails.path}`,
                                 },
 
                             ]}

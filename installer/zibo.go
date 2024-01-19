@@ -317,38 +317,32 @@ func (z *ZiboInstaller) GetDownloadProgress(update bool) float64 {
 	return progress[link]
 }
 
-func (z *ZiboInstaller) FindInstallationDetails() utils.ZiboInstallation {
-	var foundPath, version string
-	res := utils.ZiboInstallation{
-		Path:          foundPath,
-		Version:       version,
-		RemoteVersion: z.rss.GetLatestVersion(),
-		BackupVersion: z.GetLastBackupVersion(),
-	}
+func (z *ZiboInstaller) FindInstallationDetails() []utils.ZiboInstallation {
+	res := []utils.ZiboInstallation{}
 	_ = filepath.Walk(filepath.Join(z.Config.XPlanePath, "Aircraft"), func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			z.log.Errorf("Error walking path: %s", err)
 			return err // prevent panic by handling failure accessing a path
 		}
 		if info.IsDir() && info.Name() == "zibomod" {
-			z.log.Infof("Found zibo(mob) at: %s", path)
-			foundPath = path
+			z.log.Infof("Found zibo at: %s", path)
+			foundPath := filepath.Join(path, "../", "../")
+			versionFilePath := filepath.Join(foundPath, "version.txt")
+			data, err := os.ReadFile(versionFilePath)
+			if err != nil {
+				z.log.Errorf("Failed to read file: %v", err)
+			}
+			res = append(res, utils.ZiboInstallation{
+				Path:          foundPath,
+				Version:       string(data),
+				RemoteVersion: z.rss.GetLatestVersion(),
+				BackupVersion: z.GetLastBackupVersion(),
+			})
 			return filepath.SkipDir // folder found, skip the rest of this directory
 		}
 		return nil
 	})
-	if foundPath != "" {
-		foundPath = filepath.Join(foundPath, "../", "../")
-		z.log.Infof("Found zibo at: %s", foundPath)
-		res.Path = foundPath
-		versionFilePath := filepath.Join(foundPath, "version.txt")
-
-		data, err := os.ReadFile(versionFilePath)
-		if err != nil {
-			z.log.Errorf("Failed to read file: %v", err)
-		}
-		res.Version = string(data)
-	}
+	z.log.Infof("Found %d installations", len(res))
 	return res
 }
 
