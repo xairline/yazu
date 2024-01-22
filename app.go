@@ -130,3 +130,13 @@ func (a *App) GetAvailableLiveries() []installer.AvailableLivery {
 func (a *App) GetOs() string {
 	return goruntime.GOOS
 }
+
+func (a *App) DeleteFiles(files []string) string {
+	for _, file := range files {
+		err := os.Remove(file)
+		if err != nil {
+			return err.Error()
+		}
+	}
+	return ""
+}

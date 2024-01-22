@@ -19,6 +19,7 @@ import AvailableLivery = installer.AvailableLivery;
 
 interface ZiboProps {
     installationDetails: utils.ZiboInstallation
+    trigger: any
 }
 
 function Zibo(props: ZiboProps) {
@@ -56,6 +57,8 @@ function Zibo(props: ZiboProps) {
         await BackupZiboInstallation(props.installationDetails);
         const details = await FindZiboInstallationDetails();
         setRunning(false);
+        props.trigger();
+        window.location.reload();
     }
 
     const handleRestore = async () => {
@@ -64,6 +67,8 @@ function Zibo(props: ZiboProps) {
         await RestoreZiboInstallation(props.installationDetails, "");
         const details = await FindZiboInstallationDetails();
         setRunning(false);
+        props.trigger();
+        window.location.reload();
     }
     const handleInstall = async () => {
         setRunning(true);
@@ -79,6 +84,8 @@ function Zibo(props: ZiboProps) {
         await InstallZibo(props.installationDetails, downloadInfo.path);
         const details = await FindZiboInstallationDetails();
         setRunning(false);
+        props.trigger();
+        window.location.reload();
     }
 
     const handleUpdate = async () => {
@@ -95,6 +102,8 @@ function Zibo(props: ZiboProps) {
         await UpdateZibo(props.installationDetails, downloadInfo.path);
         const details = await FindZiboInstallationDetails();
         setRunning(false);
+        props.trigger();
+        window.location.reload();
     }
 
     return (

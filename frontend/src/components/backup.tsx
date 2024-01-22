@@ -1,11 +1,12 @@
 import React, {useEffect, useState} from 'react';
 import {
+    DeleteFiles,
     FindZiboInstallationDetails,
     GetBackups,
     GetCachedFiles,
     RestoreZiboInstallation
 } from "../../wailsjs/go/main/App";
-import {Card, Dropdown, Spin, Table} from "antd";
+import {Button, Card, Dropdown, Row, Spin, Table} from "antd";
 import {installer, utils} from "../../wailsjs/go/models";
 import ZiboBackup = installer.ZiboBackup;
 import ZiboInstallation = utils.ZiboInstallation;
@@ -17,6 +18,8 @@ function Backup() {
     const [cachedFiles, setCachedFiles] = useState({});
     const [progressDetails, setProgressDetails] = useState("")
     const [ziboDetails, setZiboDetails] = useState({} as ZiboInstallation[]);
+    const [selectedBackups, setSelectedBackups] = useState([] as any);
+    const [trigger, setTrigger] = useState(0);
     useEffect(() => {
         (async () => {
             const backups = await GetBackups();
@@ -27,14 +30,32 @@ function Backup() {
             setCachedFiles(cachedFiles)
         })();
 
-    }, []);
+    }, [trigger]);
 
 
     return (
 
         <Spin spinning={running} tip={progressDetails}>
+            <Row>
+                <Button
+                    danger type={"primary"}
+                    disabled={selectedBackups.length <= 0}
+                    onClick={
+                        async () => {
+                            setRunning(true)
+                            setProgressDetails("Deleting ...")
+                            await DeleteFiles(selectedBackups.map((backup: ZiboBackup) => {
+                                return backup.backupPath
+                            }))
+                            setRunning(false)
+                            setTrigger(prev => prev + 1)
+                        }
+                    }
+                > Delete </Button>
+            </Row>
             <Card style={{
                 minHeight: "100%",
+                marginTop: "12px",
             }}
             >
                 <Table
@@ -53,6 +74,12 @@ function Backup() {
                             backupPath: backup.backupPath,
                         }
                     })}
+                    rowSelection={{
+                        type: "checkbox",
+                        onChange: (selectedRowKeys: any, selectedRows: any) => {
+                            setSelectedBackups(selectedRows)
+                        }
+                    }}
                     columns={[
                         {
                             title: 'Version',

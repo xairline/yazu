@@ -8,6 +8,8 @@ export function BackupZiboInstallation(arg1:utils.ZiboInstallation):Promise<bool
 
 export function CheckXPlanePath(arg1:string,arg2:Array<string>):Promise<boolean>;
 
+export function DeleteFiles(arg1:Array<string>):Promise<string>;
+
 export function DownloadZibo(arg1:boolean):Promise<main.DownloadInfo>;
 
 export function FindZiboInstallationDetails():Promise<Array<utils.ZiboInstallation>>;

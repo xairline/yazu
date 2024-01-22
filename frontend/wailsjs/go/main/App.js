@@ -10,6 +10,10 @@ export function CheckXPlanePath(arg1, arg2) {
   return window['go']['main']['App']['CheckXPlanePath'](arg1, arg2);
 }
 
+export function DeleteFiles(arg1) {
+  return window['go']['main']['App']['DeleteFiles'](arg1);
+}
+
 export function DownloadZibo(arg1) {
   return window['go']['main']['App']['DownloadZibo'](arg1);
 }
