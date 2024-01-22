@@ -42,6 +42,10 @@ export function GetLiveries(arg1) {
   return window['go']['main']['App']['GetLiveries'](arg1);
 }
 
+export function GetOs() {
+  return window['go']['main']['App']['GetOs']();
+}
+
 export function InstallZibo(arg1, arg2) {
   return window['go']['main']['App']['InstallZibo'](arg1, arg2);
 }
