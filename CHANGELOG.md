@@ -1,3 +1,12 @@
+## [0.1.1-beta.3](https://github.com/xairline/yazu/compare/v0.1.1-beta.2...v0.1.1-beta.3) (2024-01-26)
+
+
+### Features
+
+* add version and upgrade reminder ([5ab84d9](https://github.com/xairline/yazu/commit/5ab84d95cb1d27ca01adbedb248c1658ac0cbcfb))
+
+
+
 ## [0.1.1-beta.2](https://github.com/xairline/yazu/compare/v0.1.1-beta.1...v0.1.1-beta.2) (2024-01-26)
 
 
