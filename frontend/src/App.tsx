@@ -1,8 +1,8 @@
 import React, {AriaAttributes, DOMAttributes, useEffect, useState} from 'react';
 import 'antd/dist/reset.css';
 import './App.css';
-import {Col, Image, Layout, Modal, Row, Typography} from 'antd'
-import {CheckXPlanePath, GetConfig, IsXPlanePathConfigured} from "../wailsjs/go/main/App";
+import {Badge, Card, Col, Image, Layout, Modal, Row, Typography} from 'antd'
+import {CheckXPlanePath, GetConfig, GetLatestVersion, GetVersion, IsXPlanePathConfigured} from "../wailsjs/go/main/App";
 import {Link, Route, Routes} from "react-router-dom";
 import useBreakpoint from "antd/es/grid/hooks/useBreakpoint";
 import logo from './assets/images/logo-universal.png';
@@ -17,7 +17,8 @@ function App() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isPathValid, setPathValid] = useState(false);
     const [xplanePath, setXplanePath] = useState("");
-
+    const [localVersion, setLocalVersion] = useState("");
+    const [remoteVersion, setRemoteVersion] = useState("");
     const showModal = () => {
         setIsModalOpen(true);
     };
@@ -36,6 +37,10 @@ function App() {
         (async () => {
             const config = await GetConfig();
             const isPathValid = await CheckXPlanePath(config.XPlanePath, []);
+            const localVersion = await GetVersion();
+            const remoteVersion = await GetLatestVersion();
+            setLocalVersion(localVersion);
+            setRemoteVersion(remoteVersion);
             setPathValid(isPathValid);
             if (!isPathValid) {
                 console.log(JSON.stringify(config));
@@ -70,6 +75,27 @@ function App() {
 
                             </Image>
                         </Link>
+                    </Row>
+                </Col>
+                <Col span={5} offset={17}>
+                    <Row style={{
+                        display: "flex",
+                        height: "100%",
+                    }}>
+                        <Badge
+                            className="site-badge-count-109"
+                            count={localVersion !== remoteVersion ? "Update Available" : "Up to date"}
+                            style={{
+                                backgroundColor: '#52c41a',
+                                marginTop: "24px",
+                            }}
+                        >
+                            <Card
+                                size={"small"}
+                                title={""}
+                                style={{marginTop: "24px", marginRight: "12px", width: "100%"}}
+                            >{localVersion}</Card>
+                        </Badge>
                     </Row>
                 </Col>
             </Row>

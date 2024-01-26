@@ -2,11 +2,14 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"github.com/sirupsen/logrus"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"github/xairline/yazu/installer"
 	"github/xairline/yazu/utils"
 	"io"
+	"io/ioutil"
+	"net/http"
 	"os"
 	"path/filepath"
 	goruntime "runtime"
@@ -139,4 +142,37 @@ func (a *App) DeleteFiles(files []string) string {
 		}
 	}
 	return ""
+}
+
+func (a *App) GetVersion() string {
+	return AppVersion
+}
+
+func (a *App) GetLatestVersion() string {
+	type GitHubRelease struct {
+		TagName string `json:"tag_name"` // The name of the tag for this release
+	}
+	url := "https://api.github.com/repos/xairline/yet-another-zibo-updater/releases/latest"
+	resp, err := http.Get(url)
+	if err != nil {
+		return "unknown"
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return "unknown"
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "unknown"
+	}
+
+	var release GitHubRelease
+	err = json.Unmarshal(body, &release)
+	if err != nil {
+		return "unknown"
+	}
+
+	return release.TagName
 }

@@ -42,12 +42,20 @@ export function GetDownloadDetails(arg1) {
   return window['go']['main']['App']['GetDownloadDetails'](arg1);
 }
 
+export function GetLatestVersion() {
+  return window['go']['main']['App']['GetLatestVersion']();
+}
+
 export function GetLiveries(arg1) {
   return window['go']['main']['App']['GetLiveries'](arg1);
 }
 
 export function GetOs() {
   return window['go']['main']['App']['GetOs']();
+}
+
+export function GetVersion() {
+  return window['go']['main']['App']['GetVersion']();
 }
 
 export function InstallZibo(arg1, arg2) {

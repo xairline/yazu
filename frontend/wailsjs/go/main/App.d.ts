@@ -24,9 +24,13 @@ export function GetConfig():Promise<utils.Config>;
 
 export function GetDownloadDetails(arg1:boolean):Promise<number>;
 
+export function GetLatestVersion():Promise<string>;
+
 export function GetLiveries(arg1:utils.ZiboInstallation):Promise<Array<installer.InstalledLivery>>;
 
 export function GetOs():Promise<string>;
+
+export function GetVersion():Promise<string>;
 
 export function InstallZibo(arg1:utils.ZiboInstallation,arg2:string):Promise<void>;
 
