@@ -1,3 +1,13 @@
+## [0.1.1-beta.2](https://github.com/xairline/yazu/compare/v0.1.1-beta.1...v0.1.1-beta.2) (2024-01-26)
+
+
+### Bug Fixes
+
+* auto refresh and delete backups ([8b415d1](https://github.com/xairline/yazu/commit/8b415d13daf15e6acab7183fede625b0bd40313a))
+* windows path issues ([0fce5dd](https://github.com/xairline/yazu/commit/0fce5ddf1ec7abfb7560bbd3fbbc2ec5da11dc32))
+
+
+
 ## [0.1.1-beta.1](https://github.com/xairline/yazu/compare/v0.1.1-beta.0...v0.1.1-beta.1) (2024-01-19)
 
 
