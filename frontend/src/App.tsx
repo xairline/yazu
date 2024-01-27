@@ -1,13 +1,15 @@
 import React, {AriaAttributes, DOMAttributes, useEffect, useState} from 'react';
 import 'antd/dist/reset.css';
 import './App.css';
-import {Badge, Card, Col, Image, Layout, Modal, Row, Typography} from 'antd'
+import {Button, Col, Image, Layout, Modal, Row, Typography} from 'antd'
 import {CheckXPlanePath, GetConfig, GetLatestVersion, GetVersion, IsXPlanePathConfigured} from "../wailsjs/go/main/App";
 import {Link, Route, Routes} from "react-router-dom";
 import useBreakpoint from "antd/es/grid/hooks/useBreakpoint";
 import logo from './assets/images/logo-universal.png';
 import Home from "./pages/home";
 import Config from "./components/config";
+import Paragraph from 'antd/es/typography/Paragraph';
+import {BrowserOpenURL} from "../wailsjs/runtime";
 
 const {Content,} = Layout;
 const {Title} = Typography;
@@ -77,25 +79,34 @@ function App() {
                         </Link>
                     </Row>
                 </Col>
-                <Col span={5} offset={17}>
+                <Col span={6} offset={16}>
                     <Row style={{
                         display: "flex",
                         height: "100%",
                     }}>
-                        <Badge
-                            className="site-badge-count-109"
-                            count={localVersion !== remoteVersion ? "Update Available" : "Up to date"}
+                        <Paragraph
                             style={{
-                                backgroundColor: '#52c41a',
-                                marginTop: "24px",
+                                marginTop: "36px",
+                                marginRight: "8px",
+                                width: "100%", color: "white"
+                            }}
+
+                        >{localVersion}<Button
+                            className="site-badge-count-109"
+                            type={"primary"}
+                            disabled={localVersion === remoteVersion}
+                            style={{
+                                backgroundColor: localVersion === remoteVersion ? '#52c41a' : '#1890ff',
+                                marginLeft: "8px",
+
+                            }}
+                            onClick={() => {
+                                BrowserOpenURL("https://github.com/xairline/yet-another-zibo-updater/releases/latest")
                             }}
                         >
-                            <Card
-                                size={"small"}
-                                title={""}
-                                style={{marginTop: "24px", marginRight: "12px", width: "100%"}}
-                            >{localVersion}</Card>
-                        </Badge>
+                            {localVersion !== remoteVersion ? "Update Available" : "Up to date"}
+                        </Button></Paragraph>
+
                     </Row>
                 </Col>
             </Row>
