@@ -1,3 +1,12 @@
+## [0.1.1-beta.5](https://github.com/xairline/yazu/compare/v0.1.1-beta.4...v0.1.1-beta.5) (2024-01-27)
+
+
+### Bug Fixes
+
+* ignore windows desktop.ini ([02a54ff](https://github.com/xairline/yazu/commit/02a54ffa1b297671b1f4170aa85030ecc8cb6feb))
+
+
+
 ## [0.1.1-beta.4](https://github.com/xairline/yazu/compare/v0.1.1-beta.3...v0.1.1-beta.4) (2024-01-27)
 
 
