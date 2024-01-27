@@ -444,6 +444,9 @@ func (z *ZiboInstaller) GetAvailableLiveries() []AvailableLivery {
 
 // copyFile copies a single file from src to dst, preserving file permissions.
 func copyFile(src, dst string) error {
+	if strings.LastIndex(src, "desktop.ini") != -1 {
+		return nil
+	}
 	sourceFileStat, err := os.Stat(src)
 	if err != nil {
 		return err
