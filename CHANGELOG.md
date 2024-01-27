@@ -1,3 +1,12 @@
+## [0.1.1-beta.4](https://github.com/xairline/yazu/compare/v0.1.1-beta.3...v0.1.1-beta.4) (2024-01-27)
+
+
+### Bug Fixes
+
+* add update link ([c8671bf](https://github.com/xairline/yazu/commit/c8671bf06f397986dbbcfe12b1a8ff6447a7d8bb))
+
+
+
 ## [0.1.1-beta.3](https://github.com/xairline/yazu/compare/v0.1.1-beta.2...v0.1.1-beta.3) (2024-01-26)
 
 
