@@ -19,7 +19,6 @@ import AvailableLivery = installer.AvailableLivery;
 
 interface ZiboProps {
     installationDetails: utils.ZiboInstallation
-    trigger: any
 }
 
 function Zibo(props: ZiboProps) {
@@ -36,11 +35,6 @@ function Zibo(props: ZiboProps) {
         };
         // Call it once immediately
         fetchDetails();
-        // Set an interval to call it every 30 seconds
-        const interval = setInterval(fetchDetails, 30000);
-
-        // Clear the interval when the component is unmounted
-        return () => clearInterval(interval);
 
     }, []);
     useEffect(() => {
@@ -57,7 +51,6 @@ function Zibo(props: ZiboProps) {
         await BackupZiboInstallation(props.installationDetails);
         const details = await FindZiboInstallationDetails();
         setRunning(false);
-        props.trigger();
         window.location.reload();
     }
 
@@ -67,7 +60,6 @@ function Zibo(props: ZiboProps) {
         await RestoreZiboInstallation(props.installationDetails, "");
         const details = await FindZiboInstallationDetails();
         setRunning(false);
-        props.trigger();
         window.location.reload();
     }
     const handleInstall = async () => {
@@ -84,7 +76,6 @@ function Zibo(props: ZiboProps) {
         await InstallZibo(props.installationDetails, downloadInfo.path);
         const details = await FindZiboInstallationDetails();
         setRunning(false);
-        props.trigger();
         window.location.reload();
     }
 
@@ -102,7 +93,6 @@ function Zibo(props: ZiboProps) {
         await UpdateZibo(props.installationDetails, downloadInfo.path);
         const details = await FindZiboInstallationDetails();
         setRunning(false);
-        props.trigger();
         window.location.reload();
     }
 

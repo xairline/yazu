@@ -12,7 +12,6 @@ let separator = "/"
 function Home() {
     // let allPlugins: utils.PluginConfig[] = [];
     const [ziboDetails, setZiboDetails] = useState({} as utils.ZiboInstallation[]);
-    const [trigger, setTrigger] = useState(0);
     useEffect(() => {
         (async () => {
             const config = await GetConfig();
@@ -24,7 +23,7 @@ function Home() {
             setZiboDetails(details)
         })();
 
-    }, [trigger]);
+    }, []);
 
 
     return (
@@ -35,7 +34,15 @@ function Home() {
                 type={"card"}
                 defaultActiveKey={"home"}
                 onChange={(key) => {
-                    setTrigger(prev => prev + 1)
+                    (async () => {
+                        const config = await GetConfig();
+                        const details = await FindZiboInstallationDetails();
+                        const os = await GetOs();
+                        if (os === "windows") {
+                            separator = "\\"
+                        }
+                        setZiboDetails(details)
+                    })();
                 }}
                 items={
                     [
@@ -47,7 +54,7 @@ function Home() {
                                         style={{marginRight: 12}}/>{ziboDetail.path.split(separator + "Aircraft" + separator)[1].split("/plugins/")[0]}
                                     </Row>,
                                 key: ziboDetail.path,
-                                children: <Zibo installationDetails={ziboDetail} trigger={trigger}/>,
+                                children: <Zibo installationDetails={ziboDetail}/>,
                             }
                         })),
                         {

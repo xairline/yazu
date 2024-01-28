@@ -60,7 +60,12 @@ func NewZibo(homeDirGetter utils.HomeDirGetter, singleton bool, log *logrus.Logg
 }
 
 func (z *ZiboInstaller) Update(installation utils.ZiboInstallation, zipFilePath string) {
-	z.unzip(zipFilePath, installation.Path, false)
+	patchedItems := *z.rss.GetPatchInstallItems()
+	fullUpdate := false
+	if len(patchedItems) == 0 {
+		fullUpdate = true
+	}
+	z.unzip(zipFilePath, installation.Path, fullUpdate)
 }
 
 func (z *ZiboInstaller) Backup(installation utils.ZiboInstallation) (string, error) {
@@ -281,18 +286,20 @@ func (z *ZiboInstaller) RemoveOldInstalls(installation utils.ZiboInstallation) {
 func (z *ZiboInstaller) DownloadZibo(fullInstall bool) (bool, string) {
 	var installItem utils.Item
 	var zipFilePath string
-	if fullInstall {
+	fullInstallUpdate := false
+	patchedItems := *z.rss.GetPatchInstallItems()
+	if fullInstall || len(patchedItems) == 0 {
 		fullInstallItems := *z.rss.GetFullInstallItems()
 		installItem = fullInstallItems[0]
+		fullInstallUpdate = true
 	} else {
-		patchedItems := *z.rss.GetPatchInstallItems()
 		installItem = patchedItems[len(patchedItems)-1]
 	}
 	isDownloading := false
 
 	z.log.Infof("Downloading %s, from: %s", installItem.Version, installItem.Link)
 	subPath := "full"
-	if !fullInstall {
+	if !fullInstallUpdate {
 		subPath = "patch/"
 	}
 	err := z.TorrentManager.AddTorrent(installItem.Link, subPath)
@@ -317,12 +324,13 @@ func (z *ZiboInstaller) Install(installation utils.ZiboInstallation, zipFilePath
 
 func (z *ZiboInstaller) GetDownloadProgress(update bool) float64 {
 	var link string
-	if !update {
+	patchItems := *z.rss.GetPatchInstallItems()
+	if !update || len(patchItems) == 0 {
 		fullItems := *z.rss.GetFullInstallItems()
 		fullItem := fullItems[0]
 		link = fullItem.Link
 	} else {
-		patchItems := *z.rss.GetPatchInstallItems()
+
 		patchItem := patchItems[len(patchItems)-1]
 		link = patchItem.Link
 	}
