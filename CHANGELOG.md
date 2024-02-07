@@ -1,3 +1,7 @@
+# [0.3.0](https://github.com/xairline/yazu/compare/v0.2.1-beta.1...v0.3.0) (2024-02-07)
+
+
+
 ## [0.2.1-beta.1](https://github.com/xairline/yazu/compare/v0.2.3...v0.2.1-beta.1) (2024-02-07)
 
 
