@@ -126,8 +126,8 @@ func (a *App) GetLiveries(installation utils.ZiboInstallation) []installer.Insta
 }
 
 func (a *App) GetAvailableLiveries() []installer.AvailableLivery {
-	return a.zibo.GetAvailableLiveries()
-
+	// return a.zibo.GetAvailableLiveries()
+        return []installer.AvailableLivery
 }
 
 func (a *App) GetOs() string {
