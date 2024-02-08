@@ -101,7 +101,7 @@ function App() {
 
                             }}
                             onClick={() => {
-                                BrowserOpenURL("https://github.com/xairline/yet-another-zibo-updater/releases/latest")
+                                BrowserOpenURL("https://github.com/xairline/yazu/releases/latest")
                             }}
                         >
                             {localVersion !== remoteVersion ? "Update Available" : "Up to date"}
