@@ -127,7 +127,7 @@ func (a *App) GetLiveries(installation utils.ZiboInstallation) []installer.Insta
 
 func (a *App) GetAvailableLiveries() []installer.AvailableLivery {
 	// return a.zibo.GetAvailableLiveries()
-        return []installer.AvailableLivery{}
+	return []installer.AvailableLivery{}
 }
 
 func (a *App) GetOs() string {
@@ -152,7 +152,7 @@ func (a *App) GetLatestVersion() string {
 	type GitHubRelease struct {
 		TagName string `json:"tag_name"` // The name of the tag for this release
 	}
-	url := "https://api.github.com/repos/xairline/yet-another-zibo-updater/releases/latest"
+	url := "https://api.github.com/repos/xairline/yazu/releases/latest"
 	resp, err := http.Get(url)
 	if err != nil {
 		return "unknown"

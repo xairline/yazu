@@ -14,7 +14,7 @@ echo "package main\n\n// AppVersion is the current version of the app\nconst App
 git commit -am "Bump version to $version"
 rm -rf build/bin
 wails build --platform windows/amd64,darwin/universal,linux/amd64
-npx --yes create-dmg build/bin/yazu.app build/bin --overwrite || true
+npx --yes create-dmg@6.1.0 build/bin/yazu.app build/bin --overwrite || true
 mv "build/bin/yazu 1.0.0.dmg" "build/bin/yazu_${version}.dmg"
 mv "build/bin/yazu-amd64.exe" "build/bin/yazu_${version}.exe"
 
