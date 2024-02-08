@@ -1,13 +1,13 @@
 set -e
 
-if [ -z "$1" ]
-  then
-    echo "No argument supplied, example: ./scripts/release.sh patch"
-    exit 1
-fi
+#if [ -z "$1" ]
+#  then
+#    echo "No argument supplied, example: ./scripts/release.sh patch"
+#    exit 1
+#fi
 
 
-version=$(npm version $@ --no-git-tag-version) # Adjust as needed
+version="1.0.0"
 sed -i '' "s/\"version\": \".*\"/\"version\": \"$version\"/" wails.json
 # Create a Go file with the version
 echo "package main\n\n// AppVersion is the current version of the app\nconst AppVersion = \"$version\"" > appversion.go
