@@ -1,3 +1,7 @@
+## [0.4.1](https://github.com/xairline/yazu/compare/v0.4.0...v0.4.1) (2024-02-08)
+
+
+
 # [0.4.0](https://github.com/xairline/yazu/compare/v0.2.4...v0.4.0) (2024-02-08)
 
 
