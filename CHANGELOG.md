@@ -1,3 +1,13 @@
+# [0.3.0](https://github.com/xairline/yazu/compare/v0.2.4...v0.3.0) (2024-02-08)
+
+
+### Features
+
+* support minor version upgrade ([be4512c](https://github.com/xairline/yazu/commit/be4512cf6c832bfe1b9812217b73d4bfc0a82993))
+* support minor version upgrade ([5d9906d](https://github.com/xairline/yazu/commit/5d9906d9f7be65cbb8698e5a643413f0f8feb7e6))
+
+
+
 ## [0.2.1-beta.1](https://github.com/xairline/yazu/compare/v0.2.3...v0.2.1-beta.1) (2024-02-07)
 
 
