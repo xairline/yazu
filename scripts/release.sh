@@ -21,7 +21,7 @@ mv "build/bin/yazu-amd64.exe" "build/bin/yazu_${version}.exe"
 conventional-changelog -p angular -i CHANGELOG.md -s || true
 
 git commit -am "Update changelog"
-git tag ${version}
+git tag -f ${version}
 npx --yes gh-release \
   --assets build/bin/yazu_${version}.dmg,build/bin/yazu_${version}.exe \
   -t ${version} \
@@ -30,4 +30,4 @@ npx --yes gh-release \
   -n ${version} \
   -o xairline \
   -r yazu
-git push && git push --tags
+git push && git push -f --tags
