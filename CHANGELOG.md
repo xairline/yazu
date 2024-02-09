@@ -6,20 +6,6 @@
 * support minor version upgrade ([b4fd051](https://github.com/xairline/yazu/commit/b4fd0518adcfed6334d0f6c6136c977286f4d1d6))
 * support minor version upgrade ([19de662](https://github.com/xairline/yazu/commit/19de6621541981c817b6b828fcfc361b5b5eea22))
 
-
-
-# [0.3.0](https://github.com/xairline/yazu/compare/v0.2.1-beta.1...v0.3.0) (2024-02-07)
-
-
-
-## [0.2.1-beta.1](https://github.com/xairline/yazu/compare/v0.2.3...v0.2.1-beta.1) (2024-02-07)
-
-
-
-## [0.2.1-beta.0](https://github.com/xairline/yazu/compare/v0.2.0...v0.2.1-beta.0) (2024-01-28)
-
-
-
 # [0.2.0](https://github.com/xairline/yazu/compare/v0.1.1-beta.5...v0.2.0) (2024-01-28)
 
 
