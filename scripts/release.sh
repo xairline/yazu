@@ -28,5 +28,6 @@ npx gh-release \
   -y -c main \
   -n 1.0.0 \
   -o xairline \
+  -b CHANGELOG.md \
   -r yazu
 git push && git push -f --tags
