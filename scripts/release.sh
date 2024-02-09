@@ -15,14 +15,14 @@ echo "package main\n\n// AppVersion is the current version of the app\nconst App
 #rm -rf build/bin
 #wails build --platform windows/amd64,darwin/universal,linux/amd64
 #npx --yes create-dmg@6.1.0 build/bin/yazu.app build/bin --overwrite || true
-#mv "build/bin/yazu 1.0.0.dmg" "build/bin/yazu_${version}.dmg"
-#mv "build/bin/yazu-amd64.exe" "build/bin/yazu_${version}.exe"
+mv "build/bin/yazu_1.0.0.dmg" "build/bin/yazu_${version}.dmg"
+mv "build/bin/yazu_1.0.0.exe" "build/bin/yazu_${version}.exe"
 
 conventional-changelog -p angular -i CHANGELOG.md -s || true
 
 git commit -am "Update changelog"
 git tag -f ${version}
-npx --yes gh-release \
+npx gh-release \
   --assets build/bin/yazu_${version}.dmg,build/bin/yazu_${version}.exe \
   -t ${version} \
   --prerelease \
