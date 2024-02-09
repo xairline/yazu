@@ -26,7 +26,7 @@ npx gh-release \
   -t ${version} \
   --prerelease \
   -y -c main \
-  -n 1.0.0 \
+  -n ${version} \
   -o xairline \
   -b CHANGELOG.md \
   -r yazu
