@@ -2,6 +2,13 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Launch Package",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}"
+    },
+    {
       "name": "Wails: Production yazu",
       "type": "go",
       "request": "launch",
@@ -13,7 +20,7 @@
     {
       "name": "Wails: Debug yazu",
       "type": "go",
-      "request": "launch",
+      "request": "debug",
       "mode": "exec",
       "program": "${workspaceFolder}/build/bin/yazu.exe",
       "preLaunchTask": "build debug",
@@ -26,6 +33,18 @@
       "mode": "exec",
       "program": "${workspaceFolder}/build/bin/yazu.exe",
       "preLaunchTask": "build dev",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "Launch",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "showLog": true,
+      "program": "${workspaceFolder}",
+      "preLaunchTask": "build debug",
+      "env": {},
+      "args": [],
       "cwd": "${workspaceFolder}"
     }
   ]

@@ -5,11 +5,6 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
-	"github.com/go-rod/rod"
-	"github.com/google/uuid"
-	"github.com/pkg/xattr"
-	"github.com/saracen/fastzip"
-	"github.com/sirupsen/logrus"
 	"github/xairline/yazu/utils"
 	"io"
 	"io/fs"
@@ -19,6 +14,12 @@ import (
 	"runtime"
 	"strings"
 	"time"
+
+	"github.com/go-rod/rod"
+	"github.com/google/uuid"
+	"github.com/pkg/xattr"
+	"github.com/saracen/fastzip"
+	"github.com/sirupsen/logrus"
 )
 
 type ZiboInstaller struct {
@@ -59,13 +60,13 @@ func NewZibo(homeDirGetter utils.HomeDirGetter, singleton bool, log *logrus.Logg
 	}
 }
 
-func (z *ZiboInstaller) Update(installation utils.ZiboInstallation, zipFilePath string) {
+func (z *ZiboInstaller) Update(installation utils.ZiboInstallation, zipFilePath string) error {
 	patchedItems := *z.rss.GetPatchInstallItems()
 	fullUpdate := false
 	if len(patchedItems) == 0 {
 		fullUpdate = true
 	}
-	z.unzip(zipFilePath, installation.Path, fullUpdate)
+	return z.unzip(zipFilePath, installation.Path, fullUpdate)
 }
 
 func (z *ZiboInstaller) Backup(installation utils.ZiboInstallation) (string, error) {
@@ -99,7 +100,7 @@ func (z *ZiboInstaller) Backup(installation utils.ZiboInstallation) (string, err
 	defer a.Close()
 
 	files := make(map[string]os.FileInfo)
-	err = filepath.Walk(installation.Path, func(pathname string, info os.FileInfo, err error) error {
+	filepath.Walk(installation.Path, func(pathname string, info os.FileInfo, err error) error {
 		files[pathname] = info
 		return nil
 	})
@@ -120,11 +121,11 @@ func (z *ZiboInstaller) Restore(installation utils.ZiboInstallation, backupPath 
 		backupZip = backupPath
 	}
 	destination := installation.Path
-	z.unzip(backupZip, destination, false)
-	return nil
+	return z.unzip(backupZip, destination, false)
+
 }
 
-func (z *ZiboInstaller) unzip(src, dst string, fresh bool) {
+func (z *ZiboInstaller) unzip(src, dst string, fresh bool) error {
 	// create a tmp directory
 	tmpDir := os.TempDir()
 	uuid := uuid.New().String()
@@ -141,6 +142,7 @@ func (z *ZiboInstaller) unzip(src, dst string, fresh bool) {
 	r, err := zip.OpenReader(src)
 	if err != nil {
 		z.log.Errorf("Error opening zip file: %s", err)
+		return err
 	}
 	defer r.Close()
 
@@ -148,6 +150,7 @@ func (z *ZiboInstaller) unzip(src, dst string, fresh bool) {
 		rc, err := f.Open()
 		if err != nil {
 			z.log.Errorf("Error opening file in zip: %s", err)
+			return err
 		}
 		defer rc.Close()
 
@@ -159,18 +162,21 @@ func (z *ZiboInstaller) unzip(src, dst string, fresh bool) {
 				path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0700)
 			if err != nil {
 				z.log.Errorf("Error creating file: %s", err)
+				return err
 			}
 			defer f.Close()
 
 			_, err = io.Copy(f, rc)
 			if err != nil {
 				z.log.Errorf("Error copying file contents: %s", err)
+				return err
 			}
 		}
 	}
 	err = ditto(tmpUnzipDir, dst)
 	if err != nil {
 		z.log.Errorf("Error copying file contents: %s", err)
+		return err
 	}
 	_ = os.RemoveAll(tmpUnzipDir)
 	// move files from tmp directory to destination
@@ -182,9 +188,11 @@ func (z *ZiboInstaller) unzip(src, dst string, fresh bool) {
 		std, err := exec.Command("osascript", "-e", script).CombinedOutput()
 		if err != nil {
 			z.log.Error(err)
+			return err
 		}
 		z.log.Info(string(std))
 	}
+	return nil
 
 }
 
@@ -318,8 +326,8 @@ func (z *ZiboInstaller) DownloadZibo(fullInstall bool) (bool, string) {
 	return isDownloading, zipFilePath
 }
 
-func (z *ZiboInstaller) Install(installation utils.ZiboInstallation, zipFilePath string) {
-	z.unzip(zipFilePath, installation.Path, true)
+func (z *ZiboInstaller) Install(installation utils.ZiboInstallation, zipFilePath string) error {
+	return z.unzip(zipFilePath, installation.Path, true)
 }
 
 func (z *ZiboInstaller) GetDownloadProgress(update bool) float64 {
@@ -433,9 +441,13 @@ func (z *ZiboInstaller) GetAvailableLiveries() []AvailableLivery {
 			}
 			url := *liveryUrl.MustAttribute("href")
 			liveryIcon := liveryElement.MustElementX(".//img")
+			if liveryIcon == nil {
+				z.log.Errorf("No image found in ref: %s", liveryElement)
+			}
 			icon, err := GetIconBase64(liveryIcon)
 			if err != nil {
 				z.log.Errorf("Error getting livery icon: %s", err)
+				continue
 			}
 			res = append(res, AvailableLivery{
 				Name:   name,
@@ -452,9 +464,9 @@ func (z *ZiboInstaller) GetAvailableLiveries() []AvailableLivery {
 
 // copyFile copies a single file from src to dst, preserving file permissions.
 func copyFile(src, dst string) error {
-	if strings.LastIndex(src, "desktop.ini") != -1 {
-		return nil
-	}
+	//if strings.LastIndex(src, "desktop.ini") != -1 {
+	//	return nil
+	//}
 	sourceFileStat, err := os.Stat(src)
 	if err != nil {
 		return err

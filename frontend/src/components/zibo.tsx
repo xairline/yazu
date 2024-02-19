@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import {Button, Card, Col, Descriptions, Divider, Row, Spin, Table, Tabs} from 'antd'
+import React, { useEffect, useState } from 'react';
+import { Button, Card, Col, Descriptions, Divider, Row, Spin, Table, Tabs } from 'antd'
 // import {FindZiboInstallationDetails} from "../../wailsjs/go/main/App";
 import {
     BackupZiboInstallation,
@@ -12,8 +12,8 @@ import {
     RestoreZiboInstallation,
     UpdateZibo
 } from "../../wailsjs/go/main/App";
-import {installer, utils} from "../../wailsjs/go/models";
-import {BrowserOpenURL, LogInfo} from "../../wailsjs/runtime";
+import { installer, utils } from "../../wailsjs/go/models";
+import { BrowserOpenURL, LogInfo } from "../../wailsjs/runtime";
 import InstalledLivery = installer.InstalledLivery;
 import AvailableLivery = installer.AvailableLivery;
 
@@ -90,7 +90,12 @@ function Zibo(props: ZiboProps) {
             }
         }
         setProgressDetails("Updating ...")
-        await UpdateZibo(props.installationDetails, downloadInfo.path);
+        const update_err = await UpdateZibo(props.installationDetails, downloadInfo.path);
+        if (update_err != null) {
+            setProgressDetails("Update failed, check log")
+        } else {
+            setProgressDetails("Update Succesfull")
+        }
         const details = await FindZiboInstallationDetails();
         setRunning(false);
         window.location.reload();
@@ -102,7 +107,7 @@ function Zibo(props: ZiboProps) {
         }}
         >
             <Spin spinning={running} tip={progressDetails}>
-                <Row style={{minHeight: "100%"}}>
+                <Row style={{ minHeight: "100%" }}>
                     <Col span={24} style={{
                         display: "flex",
                         justifyContent: "flex-end",
@@ -116,11 +121,11 @@ function Zibo(props: ZiboProps) {
                         <Button
                             type={"primary"}
                             danger={props.installationDetails.version !== ""}
-                            style={{marginRight: "12px"}}
+                            style={{ marginRight: "12px" }}
                             onClick={handleInstall}>{props.installationDetails.version === "" ? "Install" : "Reinstall"}</Button>
                         <Button
                             type={"primary"}
-                            style={{marginRight: "12px"}}
+                            style={{ marginRight: "12px" }}
                             disabled={
                                 props.installationDetails.version === props.installationDetails.remoteVersion ||
                                 props.installationDetails.version === ""
@@ -128,13 +133,13 @@ function Zibo(props: ZiboProps) {
                             onClick={handleUpdate}>Update</Button>
                         <Button
                             type={"primary"}
-                            style={{marginRight: "12px"}}
+                            style={{ marginRight: "12px" }}
                             disabled={props.installationDetails.version === ""}
                             onClick={handleBackup}>Backup</Button>
                         <Button
                             type={"primary"}
                             danger={true}
-                            style={{marginRight: "12px"}}
+                            style={{ marginRight: "12px" }}
                             disabled={props.installationDetails.backupVersion === "N/A"}
                             onClick={handleRestore}>Restore</Button>
                     </Col>
@@ -170,7 +175,7 @@ function Zibo(props: ZiboProps) {
                             ]}
                         />
                     </Col>
-                    <Divider/>
+                    <Divider />
                     <Col span={24}>
                         <Tabs items={[
                             {
@@ -179,15 +184,15 @@ function Zibo(props: ZiboProps) {
                                 children: <Table
                                     // title={() => "Liveries"}
                                     dataSource={installedLiveries}
-                                    style={{overflow: "scroll"}}
+                                    style={{ overflow: "scroll" }}
                                     columns={[
                                         {
                                             title: 'Icon',
                                             dataIndex: 'icon',
                                             key: 'icon',
                                             render: (icon: string) => <img src={`data:image/png;base64,${icon}`}
-                                                                           alt={"icon"}
-                                                                           width={160} height={90}/>
+                                                alt={"icon"}
+                                                width={160} height={90} />
                                         },
                                         {
                                             title: 'Name',
@@ -208,16 +213,16 @@ function Zibo(props: ZiboProps) {
                                 children: <Table
                                     title={() => "Liveries"}
                                     dataSource={availableLiveries}
-                                    style={{overflow: "scroll"}}
-                                    pagination={{pageSize: 25}}
+                                    style={{ overflow: "scroll" }}
+                                    pagination={{ pageSize: 25 }}
                                     columns={[
                                         {
                                             title: 'Icon',
                                             dataIndex: 'icon',
                                             key: 'icon',
                                             render: (icon: string) => <img src={`data:image/png;base64,${icon}`}
-                                                                           alt={"icon"}
-                                                                           width={320} height={200}/>
+                                                alt={"icon"}
+                                                width={320} height={200} />
                                         },
                                         {
                                             title: 'Name',

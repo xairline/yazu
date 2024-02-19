@@ -2,12 +2,14 @@ package installer
 
 import (
 	"encoding/base64"
-	"github.com/go-rod/rod"
-	"github.com/sirupsen/logrus"
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/go-rod/rod"
+	"github.com/sirupsen/logrus"
 )
 
 func GetNumberOfPages(page *rod.Page) (int, error) {
@@ -28,6 +30,9 @@ func GetNumberOfPages(page *rod.Page) (int, error) {
 func GetIconBase64(iconElem *rod.Element) (string, error) {
 	imageURL := iconElem.MustAttribute("data-src")
 
+	if imageURL == nil {
+		return "", errors.New("no url found in icon element")
+	}
 	// Step 1: Fetch the image content
 	response, err := http.Get(*imageURL)
 	if err != nil {
