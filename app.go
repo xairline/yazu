@@ -3,8 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"github.com/sirupsen/logrus"
-	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"github/xairline/yazu/installer"
 	"github/xairline/yazu/utils"
 	"io"
@@ -13,6 +11,9 @@ import (
 	"os"
 	"path/filepath"
 	goruntime "runtime"
+
+	"github.com/sirupsen/logrus"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 // App struct
@@ -105,8 +106,8 @@ func (a *App) DownloadZibo(fullInstall bool) DownloadInfo {
 	return res
 }
 
-func (a *App) UpdateZibo(installation utils.ZiboInstallation, zipPath string) {
-	a.zibo.Update(installation, zipPath)
+func (a *App) UpdateZibo(installation utils.ZiboInstallation, zipPath string) error {
+	return a.zibo.Update(installation, zipPath)
 }
 
 func (a *App) GetDownloadDetails(update bool) float64 {
